@@ -1,0 +1,17 @@
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryUrl].$error.server}">Docker Registry Url:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryUrl].$error.server}" type="text" ng-model="RegistryUrl" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[RegistryUrl].$error.server}" ng-show="GOINPUTNAME[RegistryUrl].$error.server">{{GOINPUTNAME[RegistryUrl].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Username].$error.server}">Username:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[Username].$error.server}" type="text" ng-model="Username" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Username].$error.server}" ng-show="GOINPUTNAME[Username].$error.server">{{GOINPUTNAME[Username].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Password].$error.server}">Password:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[Password].$error.server}" type="password" ng-model="Password" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Password].$error.server}" ng-show="GOINPUTNAME[Password].$error.server">{{GOINPUTNAME[Password].$error.server}}</span>
+</div>

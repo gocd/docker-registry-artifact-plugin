@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright 2017 ThoughtWorks, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+This page contains the view for your settings.
+Ensure that the keys you use are also declared in the GetPluginConfigurationExecutor class
+TODO: change this to your needs
+-->
+<div class="form_item_block">
+  <label>Go Server URL:<span class='asterix'>*</span></label>
+  <input type="text" ng-model="go_server_url" ng-required="true"/>
+  <span class="form_error" ng-show="GOINPUTNAME[go_server_url].$error.server">{{GOINPUTNAME[go_server_url].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+  <label>Api URL:<span class='asterix'>*</span></label>
+  <input type="text" ng-model="api_url" ng-required="true"/>
+  <span class="form_error" ng-show="GOINPUTNAME[api_url].$error.server">{{GOINPUTNAME[api_url].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+  <label>Api User:<span class='asterix'>*</span></label>
+  <input type="text" ng-model="api_user" ng-required="true"/>
+  <span class="form_error" ng-show="GOINPUTNAME[api_user].$error.server">{{GOINPUTNAME[api_user].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+  <label>Api Key:<span class='asterix'>*</span></label>
+  <input type="password" ng-model="api_key" ng-required="true"/>
+  <span class="form_error" ng-show="GOINPUTNAME[api_key].$error.server">{{GOINPUTNAME[api_key].$error.server}}</span>
+</div>
