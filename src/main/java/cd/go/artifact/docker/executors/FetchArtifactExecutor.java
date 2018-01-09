@@ -16,6 +16,8 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.DockerClientFactory;
+import cd.go.artifact.docker.DockerEventListener;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.model.FetchArtifactConfig;
 import com.google.gson.annotations.Expose;
@@ -23,6 +25,8 @@ import com.google.gson.annotations.SerializedName;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.fabric8.docker.client.DockerClient;
+import io.fabric8.docker.dsl.OutputHandle;
 
 import java.util.Map;
 
@@ -31,25 +35,42 @@ import static cd.go.artifact.docker.utils.Util.GSON;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
+    private DockerClientFactory clientFactory;
 
     public FetchArtifactExecutor(GoPluginApiRequest request) {
+        this(request, DockerClientFactory.instance());
+    }
+
+    FetchArtifactExecutor(GoPluginApiRequest request, DockerClientFactory clientFactory) {
         this.fetchArtifactRequest = FetchArtifactRequest.fromJSON(request.requestBody());
+        this.clientFactory = clientFactory;
     }
 
     @Override
     public GoPluginApiResponse execute() {
-        fetch(fetchArtifactRequest);
+        try {
+            fetch();
+        } catch (Exception e) {
+            LOG.info(String.format("Failed to download artifact %s - %s", fetchArtifactRequest.getMetadata().get("docker-image"), e));
+            return DefaultGoPluginApiResponse.error(e.getMessage());
+        }
         return DefaultGoPluginApiResponse.success("");
     }
 
-    private void fetch(FetchArtifactRequest fetchArtifactRequest) {
+    private void fetch() throws Exception {
+        LOG.info(String.valueOf(fetchArtifactRequest.getMetadata()));
+        LOG.info(String.valueOf(fetchArtifactRequest.getArtifactStoreConfig()));
         LOG.info(String.format("Fetching artifact %s", fetchArtifactRequest.getFetchArtifactConfig()));
-        try {
-            throw new RuntimeException("Implement me!");
-        } catch (Exception e) {
-            LOG.error("Failed to download artifact s" + e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
+
+        DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
+        final DockerEventListener dockerEventListener = new DockerEventListener();
+        OutputHandle handle = docker.image().withName((String) fetchArtifactRequest.getMetadata().get("docker-image")).pull()
+                .usingListener(dockerEventListener)
+                .fromRegistry();
+
+        dockerEventListener.await();
+        handle.close();
+        docker.close();
     }
 
     private static class FetchArtifactRequest {

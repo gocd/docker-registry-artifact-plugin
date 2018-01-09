@@ -52,7 +52,7 @@ public class PublishArtifactExecutor implements RequestExecutor {
             publish(publishArtifactConfig);
         } catch (Exception e) {
             publishArtifactResponse.addError(String.format("Could not upload artifact: %s", e.getMessage()));
-            e.printStackTrace();
+            LOG.error(String.format("Could not upload artifact: %%s%s", e));
         }
         return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
     }
