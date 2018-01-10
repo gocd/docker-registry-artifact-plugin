@@ -20,23 +20,26 @@ import io.fabric8.docker.dsl.EventListener;
 
 import java.util.concurrent.CountDownLatch;
 
+import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
+
 public class DockerEventListener implements EventListener {
     private final CountDownLatch pushDone = new CountDownLatch(1);
 
     @Override
     public void onSuccess(String message) {
-        System.out.println("Success:" + message);
+        LOG.info("Success:" + message);
         pushDone.countDown();
     }
 
     @Override
     public void onError(String messsage) {
-        System.err.println("Failure:" + messsage);
+        LOG.error("Failure:" + messsage);
         pushDone.countDown();
     }
 
     @Override
     public void onError(Throwable t) {
+        LOG.error("Failure: " + t);
         t.printStackTrace(System.err);
         pushDone.countDown();
     }
