@@ -25,31 +25,33 @@ public class PublishArtifactConfigTest {
     @Test
     public void shouldDeserializeRequestBody() {
         final String json = "{\n" +
+                "  \"agent_working_directory\": \"/temp\",\n" +
                 "  \"artifact_infos\": [\n" +
                 "    {\n" +
+                "      \"id\": \"hub.docker\",\n" +
                 "      \"configuration\": {\n" +
-                "        \"Foo\": \"Bar\"\n" +
+                "        \"RegistryURL\": \"public-registry-url\",\n" +
+                "        \"Username\": \"username\",\n" +
+                "        \"Password\": \"password\"\n" +
                 "      },\n" +
-                "      \"id\": \"s3-store\",\n" +
                 "      \"artifact_plans\": [\n" +
                 "        {\n" +
-                "          \"configuration\": {\n" +
-                "            \"BuildFile\": \"build-file.json\"\n" +
-                "          },\n" +
                 "          \"id\": \"alpine\",\n" +
-                "          \"storeId\": \"s3-store\"\n" +
+                "          \"storeId\": \"hub.docker\",\n" +
+                "          \"configuration\": {\n" +
+                "            \"BuildFile\": \"alpine-build.json\"\n" +
+                "          }\n" +
                 "        },\n" +
                 "        {\n" +
-                "          \"configuration\": {\n" +
-                "            \"BuildFile\": \"build-file2.json\"\n" +
-                "          },\n" +
                 "          \"id\": \"centos\",\n" +
-                "          \"storeId\": \"s3-store\"\n" +
+                "          \"storeId\": \"hub.docker\",\n" +
+                "          \"configuration\": {\n" +
+                "            \"BuildFile\": \"centos-build.json\"\n" +
+                "          }\n" +
                 "        }\n" +
                 "      ]\n" +
                 "    }\n" +
-                "  ],\n" +
-                "  \"agent_working_directory\": \"/temp\"\n" +
+                "  ]\n" +
                 "}";
 
         final PublishArtifactConfig publishArtifactConfig = PublishArtifactConfig.fromJSON(json);
@@ -58,13 +60,13 @@ public class PublishArtifactConfigTest {
         assertThat(publishArtifactConfig.getAgentWorkingDir()).isEqualTo("/temp");
 
         final ArtifactInfo artifactInfo = publishArtifactConfig.getArtifactInfos().get(0);
-        assertThat(artifactInfo.getId()).isEqualTo("s3-store");
-        assertThat(artifactInfo.getArtifactStoreConfig()).isEqualTo(new ArtifactStoreConfig(null, null, null));
+        assertThat(artifactInfo.getId()).isEqualTo("hub.docker");
+        assertThat(artifactInfo.getArtifactStoreConfig()).isEqualTo(new ArtifactStoreConfig("public-registry-url", "username", "password"));
 
         assertThat(artifactInfo.getArtifactPlans()).hasSize(2);
         assertThat(artifactInfo.getArtifactPlans()).containsExactlyInAnyOrder(
-                new ArtifactPlan("alpine", "s3-store", new ArtifactPlanConfig("build-file.json")),
-                new ArtifactPlan("centos", "s3-store", new ArtifactPlanConfig("build-file2.json"))
+                new ArtifactPlan("alpine", "hub.docker", "alpine-build.json"),
+                new ArtifactPlan("centos", "hub.docker", "centos-build.json")
         );
     }
 }

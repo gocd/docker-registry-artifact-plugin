@@ -31,7 +31,7 @@ import static java.text.MessageFormat.format;
 public class DockerClientFactory {
     private static final DockerClientFactory DOCKER_CLIENT_FACTORY = new DockerClientFactory();
 
-    public synchronized DockerClient docker(ArtifactStoreConfig artifactStoreConfig) throws Exception {
+    public DockerClient docker(ArtifactStoreConfig artifactStoreConfig) {
         return createClient(artifactStoreConfig);
     }
 

@@ -19,6 +19,7 @@ package cd.go.artifact.docker.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cd.go.artifact.docker.utils.Util.GSON;
@@ -32,8 +33,12 @@ public class PublishArtifactConfig {
     @SerializedName("artifact_infos")
     private List<ArtifactInfo> artifactInfos;
 
-    public static PublishArtifactConfig fromJSON(String json) {
-        return GSON.fromJson(json, PublishArtifactConfig.class);
+    public PublishArtifactConfig() {
+    }
+
+    public PublishArtifactConfig(String agentWorkingDir, ArtifactInfo... artifactInfos) {
+        this.agentWorkingDir = agentWorkingDir;
+        this.artifactInfos = Arrays.asList(artifactInfos);
     }
 
     public String getAgentWorkingDir() {
@@ -61,5 +66,13 @@ public class PublishArtifactConfig {
         int result = agentWorkingDir != null ? agentWorkingDir.hashCode() : 0;
         result = 31 * result + (artifactInfos != null ? artifactInfos.hashCode() : 0);
         return result;
+    }
+
+    public static PublishArtifactConfig fromJSON(String json) {
+        return GSON.fromJson(json, PublishArtifactConfig.class);
+    }
+
+    public String toJSON() {
+        return GSON.toJson(this);
     }
 }

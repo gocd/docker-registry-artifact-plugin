@@ -18,15 +18,12 @@ package cd.go.artifact.docker.model;
 
 import cd.go.artifact.docker.annotation.ProfileField;
 import cd.go.artifact.docker.annotation.Validatable;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
 
 import static cd.go.artifact.docker.utils.Util.GSON;
 
@@ -47,10 +44,14 @@ public class ArtifactPlanConfig implements Validatable {
         return buildFile;
     }
 
-    public Map<String, String> getImageAndTag(String agentWorkingDirectory) throws IOException {
-        final byte[] bytes = Files.readAllBytes(Paths.get(agentWorkingDirectory, getBuildFile()));
-        return GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), new TypeToken<Map<String, String>>() {
-        }.getType());
+    public DockerImage imageToPush(String agentWorkingDirectory) {
+        try {
+            return DockerImage.fromFile(new File(agentWorkingDirectory, getBuildFile()));
+        } catch (JsonSyntaxException e) {
+            throw new RuntimeException(String.format("File[%s] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.", buildFile));
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override

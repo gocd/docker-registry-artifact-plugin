@@ -17,7 +17,7 @@
 package cd.go.artifact.docker.executors;
 
 import cd.go.artifact.docker.DockerClientFactory;
-import cd.go.artifact.docker.DockerEventListener;
+import cd.go.artifact.docker.DockerPushEventListener;
 import cd.go.artifact.docker.model.*;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -26,7 +26,6 @@ import io.fabric8.docker.client.DockerClient;
 import io.fabric8.docker.dsl.OutputHandle;
 
 import java.util.List;
-import java.util.Map;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.lang.String.format;
@@ -48,16 +47,11 @@ public class PublishArtifactExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() {
-        try {
-            publish(publishArtifactConfig);
-        } catch (Exception e) {
-            publishArtifactResponse.addError(String.format("Could not upload artifact: %s", e.getMessage()));
-            LOG.error(String.format("Could not upload artifact: %%s%s", e));
-        }
+        publish(publishArtifactConfig);
         return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
     }
 
-    private void publish(PublishArtifactConfig publishArtifactConfigs) throws Exception {
+    private void publish(PublishArtifactConfig publishArtifactConfigs) {
         if (publishArtifactConfigs == null || publishArtifactConfigs.getArtifactInfos().isEmpty()) {
             publishArtifactResponse.addError("No artifact to publish.");
             return;
@@ -68,7 +62,7 @@ public class PublishArtifactExecutor implements RequestExecutor {
         }
     }
 
-    private void publishArtifactsToArtifactStore(ArtifactInfo artifactInfo) throws Exception {
+    private void publishArtifactsToArtifactStore(ArtifactInfo artifactInfo) {
         final ArtifactStoreConfig artifactStoreConfig = artifactInfo.getArtifactStoreConfig();
         final List<ArtifactPlan> artifactPlans = artifactInfo.getArtifactPlans();
 
@@ -77,22 +71,27 @@ public class PublishArtifactExecutor implements RequestExecutor {
         }
     }
 
-    private void publishArtifact(ArtifactStoreConfig artifactStoreConfig, ArtifactPlan artifactPlan) throws Exception {
-        final Map<String, String> buildFile = artifactPlan.getArtifactPlanConfig().getImageAndTag(publishArtifactConfig.getAgentWorkingDir());
-        final DockerClient docker = clientFactory.docker(artifactStoreConfig);
+    private void publishArtifact(ArtifactStoreConfig artifactStoreConfig, ArtifactPlan artifactPlan) {
+        try {
+            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactConfig.getAgentWorkingDir());
+            final DockerClient docker = clientFactory.docker(artifactStoreConfig);
 
-        LOG.info(format("Uploading artifact using %s to artifact store with id `%s`.", artifactPlan, artifactPlan.getStoreId()));
-        final String imageToPush = String.format("%s:%s", buildFile.get("image"), buildFile.get("tag"));
+            LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
 
+            final DockerPushEventListener dockerPushEventListener = new DockerPushEventListener(publishArtifactResponse, image.toString());
+            OutputHandle handle = docker.image().withName(image.getImage())
+                    .push()
+                    .usingListener(dockerPushEventListener)
+                    .withTag(image.getTag())
+                    .force()
+                    .toRegistry();
 
-        final DockerEventListener dockerEventListener = new DockerEventListener(publishArtifactResponse, imageToPush);
-        OutputHandle handle = docker.image().withName(buildFile.get("image")).push()
-                .usingListener(dockerEventListener)
-                .withTag(buildFile.get("tag"))
-                .toRegistry();
-
-        dockerEventListener.await();
-        handle.close();
-        docker.close();
+            dockerPushEventListener.await();
+            handle.close();
+            docker.close();
+        } catch (Exception e) {
+            publishArtifactResponse.addError(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
+            LOG.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
+        }
     }
 }

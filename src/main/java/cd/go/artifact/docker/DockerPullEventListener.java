@@ -16,53 +16,46 @@
 
 package cd.go.artifact.docker;
 
-import cd.go.artifact.docker.model.PublishArtifactResponse;
 import io.fabric8.docker.dsl.EventListener;
 
 import java.util.concurrent.CountDownLatch;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 
-public class DockerEventListener implements EventListener {
+public class DockerPullEventListener implements EventListener {
     private final CountDownLatch pushDone = new CountDownLatch(1);
-    private PublishArtifactResponse publishArtifactResponse;
-    private String imageToPush;
+    private DockerPullResponse dockerPullResponse;
 
-    public DockerEventListener() {
-    }
-
-    public DockerEventListener(PublishArtifactResponse publishArtifactResponse, String imageToPush) {
-        this.publishArtifactResponse = publishArtifactResponse;
-        this.imageToPush = imageToPush;
+    public DockerPullEventListener() {
+        dockerPullResponse = new DockerPullResponse();
     }
 
     @Override
     public void onSuccess(String message) {
         LOG.info("Success:" + message);
-        publishArtifactResponse.addMetadata("docker-image", imageToPush);
         pushDone.countDown();
     }
 
     @Override
-    public void onError(String messsage) {
-        LOG.error("Failure:" + messsage);
-        publishArtifactResponse.addError("Failure:" + messsage);
+    public void onError(String message) {
         pushDone.countDown();
+        dockerPullResponse.exception(new RuntimeException(message));
     }
 
     @Override
     public void onError(Throwable t) {
-        LOG.error("Failure: " + t);
-        publishArtifactResponse.addError("Failure: " + t);
         pushDone.countDown();
+        LOG.error("Failure: ", t);
+        dockerPullResponse.exception(t);
     }
 
     @Override
     public void onEvent(String event) {
-        System.out.println(event);
+        LOG.info(String.format("Docker Pull: %s", event));
     }
 
-    public void await() throws InterruptedException {
+    public DockerPullResponse await() throws InterruptedException {
         pushDone.await();
+        return this.dockerPullResponse;
     }
 }

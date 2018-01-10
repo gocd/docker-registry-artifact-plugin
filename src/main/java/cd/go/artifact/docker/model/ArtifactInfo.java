@@ -18,8 +18,8 @@ package cd.go.artifact.docker.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cd.go.artifact.docker.utils.Util.GSON;
@@ -37,9 +37,13 @@ public class ArtifactInfo {
     @SerializedName("artifact_plans")
     private List<ArtifactPlan> artifactPlans;
 
-    public static List<ArtifactInfo> fromJSONList(String requestBody) {
-        return GSON.fromJson(requestBody, new TypeToken<List<ArtifactInfo>>() {
-        }.getType());
+    public ArtifactInfo() {
+    }
+
+    public ArtifactInfo(String id, ArtifactStoreConfig artifactStoreConfig, ArtifactPlan... artifactPlans) {
+        this.id = id;
+        this.artifactStoreConfig = artifactStoreConfig;
+        this.artifactPlans = Arrays.asList(artifactPlans);
     }
 
     public static ArtifactInfo fromJSON(String json) {

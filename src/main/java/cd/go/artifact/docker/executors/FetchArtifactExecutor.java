@@ -17,7 +17,8 @@
 package cd.go.artifact.docker.executors;
 
 import cd.go.artifact.docker.DockerClientFactory;
-import cd.go.artifact.docker.DockerEventListener;
+import cd.go.artifact.docker.DockerPullEventListener;
+import cd.go.artifact.docker.DockerPullResponse;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.model.FetchArtifactConfig;
 import com.google.gson.annotations.Expose;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static cd.go.artifact.docker.utils.Util.GSON;
+import static java.lang.String.format;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
@@ -49,31 +51,36 @@ public class FetchArtifactExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() {
         try {
-            fetch();
-        } catch (Exception e) {
-            LOG.info(String.format("Failed to download artifact %s - %s", fetchArtifactRequest.getMetadata().get("docker-image"), e));
-            return DefaultGoPluginApiResponse.error(e.getMessage());
+            DockerPullResponse dockerPullResponse = fetch();
+            if (dockerPullResponse.hasException()) {
+                throw dockerPullResponse.getThrowable();
+            }
+            return DefaultGoPluginApiResponse.success("");
+
+        } catch (Throwable e) {
+            final String message = String.format("Failed pull docker image %s: %s", fetchArtifactRequest.getMetadata().get("docker-image"), e);
+            LOG.error(message);
+            return DefaultGoPluginApiResponse.error(message);
         }
-        return DefaultGoPluginApiResponse.success("");
     }
 
-    private void fetch() throws Exception {
-        LOG.info(String.valueOf(fetchArtifactRequest.getMetadata()));
-        LOG.info(String.valueOf(fetchArtifactRequest.getArtifactStoreConfig()));
-        LOG.info(String.format("Fetching artifact %s", fetchArtifactRequest.getFetchArtifactConfig()));
+    private DockerPullResponse fetch() throws Exception {
+        final String imageToPull = (String) fetchArtifactRequest.getMetadata().get("docker-image");
+        LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
         DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-        final DockerEventListener dockerEventListener = new DockerEventListener();
-        OutputHandle handle = docker.image().withName((String) fetchArtifactRequest.getMetadata().get("docker-image")).pull()
-                .usingListener(dockerEventListener)
+        final DockerPullEventListener dockerPullEventListener = new DockerPullEventListener();
+        OutputHandle handle = docker.image().withName(imageToPull).pull()
+                .usingListener(dockerPullEventListener)
                 .fromRegistry();
 
-        dockerEventListener.await();
+        final DockerPullResponse dockerPullResponse = dockerPullEventListener.await();
         handle.close();
         docker.close();
+        return dockerPullResponse;
     }
 
-    private static class FetchArtifactRequest {
+    protected static class FetchArtifactRequest {
         @Expose
         @SerializedName("store_configuration")
         private ArtifactStoreConfig artifactStoreConfig;
@@ -83,6 +90,15 @@ public class FetchArtifactExecutor implements RequestExecutor {
         @Expose
         @SerializedName("artifact_metadata")
         private Map<String, Object> metadata;
+
+        public FetchArtifactRequest() {
+        }
+
+        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, FetchArtifactConfig fetchArtifactConfig, Map<String, Object> metadata) {
+            this.artifactStoreConfig = artifactStoreConfig;
+            this.fetchArtifactConfig = fetchArtifactConfig;
+            this.metadata = metadata;
+        }
 
         public ArtifactStoreConfig getArtifactStoreConfig() {
             return artifactStoreConfig;
