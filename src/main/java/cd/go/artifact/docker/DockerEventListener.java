@@ -16,6 +16,7 @@
 
 package cd.go.artifact.docker;
 
+import cd.go.artifact.docker.model.PublishArtifactResponse;
 import io.fabric8.docker.dsl.EventListener;
 
 import java.util.concurrent.CountDownLatch;
@@ -24,23 +25,35 @@ import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 
 public class DockerEventListener implements EventListener {
     private final CountDownLatch pushDone = new CountDownLatch(1);
+    private PublishArtifactResponse publishArtifactResponse;
+    private String imageToPush;
+
+    public DockerEventListener() {
+    }
+
+    public DockerEventListener(PublishArtifactResponse publishArtifactResponse, String imageToPush) {
+        this.publishArtifactResponse = publishArtifactResponse;
+        this.imageToPush = imageToPush;
+    }
 
     @Override
     public void onSuccess(String message) {
         LOG.info("Success:" + message);
+        publishArtifactResponse.addMetadata("docker-image", imageToPush);
         pushDone.countDown();
     }
 
     @Override
     public void onError(String messsage) {
         LOG.error("Failure:" + messsage);
+        publishArtifactResponse.addError("Failure:" + messsage);
         pushDone.countDown();
     }
 
     @Override
     public void onError(Throwable t) {
         LOG.error("Failure: " + t);
-        t.printStackTrace(System.err);
+        publishArtifactResponse.addError("Failure: " + t);
         pushDone.countDown();
     }
 

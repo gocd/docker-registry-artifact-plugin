@@ -85,7 +85,7 @@ public class PublishArtifactExecutor implements RequestExecutor {
         final String imageToPush = String.format("%s:%s", buildFile.get("image"), buildFile.get("tag"));
 
 
-        final DockerEventListener dockerEventListener = new DockerEventListener();
+        final DockerEventListener dockerEventListener = new DockerEventListener(publishArtifactResponse, imageToPush);
         OutputHandle handle = docker.image().withName(buildFile.get("image")).push()
                 .usingListener(dockerEventListener)
                 .withTag(buildFile.get("tag"))
@@ -94,6 +94,5 @@ public class PublishArtifactExecutor implements RequestExecutor {
         dockerEventListener.await();
         handle.close();
         docker.close();
-        publishArtifactResponse.addMetadata("docker-image", imageToPush);
     }
 }
