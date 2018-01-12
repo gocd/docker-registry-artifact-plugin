@@ -17,13 +17,11 @@
 package cd.go.artifact.docker;
 
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
-import io.fabric8.docker.api.model.AuthConfig;
-import io.fabric8.docker.client.Config;
-import io.fabric8.docker.client.ConfigBuilder;
-import io.fabric8.docker.client.DefaultDockerClient;
-import io.fabric8.docker.client.DockerClient;
-
-import java.util.Collections;
+import com.spotify.docker.client.DefaultDockerClient;
+import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.exceptions.DockerCertificateException;
+import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.RegistryAuth;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.text.MessageFormat.format;
@@ -31,7 +29,7 @@ import static java.text.MessageFormat.format;
 public class DockerClientFactory {
     private static final DockerClientFactory DOCKER_CLIENT_FACTORY = new DockerClientFactory();
 
-    public DockerClient docker(ArtifactStoreConfig artifactStoreConfig) {
+    public DockerClient docker(ArtifactStoreConfig artifactStoreConfig) throws InterruptedException, DockerException, DockerCertificateException {
         return createClient(artifactStoreConfig);
     }
 
@@ -39,16 +37,18 @@ public class DockerClientFactory {
         return DOCKER_CLIENT_FACTORY;
     }
 
-    private static DefaultDockerClient createClient(ArtifactStoreConfig artifactStoreConfig) {
-        Config config = new ConfigBuilder()
-                .withAuthConfigs(Collections.singletonMap(artifactStoreConfig.getRegistryUrl(), new AuthConfig(null, null, artifactStoreConfig.getPassword(), artifactStoreConfig.getRegistryUrl(), artifactStoreConfig.getUsername())))
-                .build();
+    private static DefaultDockerClient createClient(ArtifactStoreConfig artifactStoreConfig) throws DockerCertificateException, DockerException, InterruptedException {
+        final RegistryAuth registryAuth = RegistryAuth.builder()
+                .username(artifactStoreConfig.getUsername())
+                .serverAddress(artifactStoreConfig.getRegistryUrl())
+                .password(artifactStoreConfig.getPassword()).build();
+
+        DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuth(registryAuth).build();
 
         LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getRegistryUrl()));
 
-        DefaultDockerClient docker = new DefaultDockerClient(config);
-        docker.ping();
-        if (!docker.ping()) {
+        final String result = docker.ping();
+        if (!result.equalsIgnoreCase("OK")) {
             throw new RuntimeException("Could not ping the docker server.");
         }
         return docker;

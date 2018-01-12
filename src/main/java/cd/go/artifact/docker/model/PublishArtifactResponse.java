@@ -53,7 +53,7 @@ public class PublishArtifactResponse {
         return errors;
     }
 
-    public void addMetadata(String key, String value) {
+    public void addMetadata(String key, Object value) {
         this.metadata.put(key, value);
     }
 

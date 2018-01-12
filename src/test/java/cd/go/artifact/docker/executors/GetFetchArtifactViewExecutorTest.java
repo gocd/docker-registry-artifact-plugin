@@ -16,8 +16,6 @@
 
 package cd.go.artifact.docker.executors;
 
-import cd.go.artifact.docker.annotation.Validatable;
-import cd.go.artifact.docker.model.FetchArtifactConfig;
 import cd.go.artifact.docker.utils.Util;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -28,25 +26,15 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class GetFetchArtifactViewExecutorTest extends ViewTest {
+public class GetFetchArtifactViewExecutorTest {
 
     @Test
-    public void shouldRenderTheTemplateInJSON() throws Exception {
-        GoPluginApiResponse response = getRequestExecutor().execute();
+    public void shouldRenderTheTemplateInJSON() {
+        GoPluginApiResponse response = new GetFetchArtifactViewExecutor().execute();
 
         Map<String, String> responseHash = new Gson().fromJson(response.responseBody(), HashMap.class);
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(responseHash).containsEntry("template", Util.readResource("/fetch-artifact.template.html"));
-    }
-
-    @Override
-    protected Class<? extends Validatable> getConfigClass() {
-        return FetchArtifactConfig.class;
-    }
-
-    @Override
-    protected RequestExecutor getRequestExecutor() {
-        return new GetFetchArtifactViewExecutor();
     }
 }

@@ -16,23 +16,15 @@
 
 package cd.go.artifact.docker.executors;
 
-import cd.go.artifact.docker.model.FetchArtifactConfig;
-import cd.go.artifact.docker.annotation.MetadataValidator;
 import cd.go.artifact.docker.annotation.ValidationResult;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 public class ValidateFetchArtifactConfigExecutor implements RequestExecutor {
-    private final FetchArtifactConfig fetchArtifactConfig;
-
-    public ValidateFetchArtifactConfigExecutor(GoPluginApiRequest request) {
-        fetchArtifactConfig = FetchArtifactConfig.fromJSON(request.requestBody());
-    }
 
     @Override
     public GoPluginApiResponse execute() {
-        final ValidationResult validationResult = new MetadataValidator().validate(fetchArtifactConfig);
+        final ValidationResult validationResult = new ValidationResult();
         return DefaultGoPluginApiResponse.success(validationResult.toJSON());
     }
 }

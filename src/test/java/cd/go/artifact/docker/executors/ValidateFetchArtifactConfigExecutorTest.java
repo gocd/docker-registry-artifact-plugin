@@ -16,31 +16,16 @@
 
 package cd.go.artifact.docker.executors;
 
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 public class ValidateFetchArtifactConfigExecutorTest {
-    @Mock
-    private GoPluginApiRequest request;
-
-    @Before
-    public void setUp() {
-        initMocks(this);
-    }
-
     @Test
     public void shouldValidateMandatoryKeys() throws Exception {
-        when(request.requestBody()).thenReturn("{}");
 
-        final GoPluginApiResponse response = new ValidateFetchArtifactConfigExecutor(request).execute();
+        final GoPluginApiResponse response = new ValidateFetchArtifactConfigExecutor().execute();
 
         String expectedJSON = "[]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);

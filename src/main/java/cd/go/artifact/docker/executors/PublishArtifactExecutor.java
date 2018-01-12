@@ -17,14 +17,14 @@
 package cd.go.artifact.docker.executors;
 
 import cd.go.artifact.docker.DockerClientFactory;
-import cd.go.artifact.docker.DockerPushEventListener;
+import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.*;
+import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.fabric8.docker.client.DockerClient;
-import io.fabric8.docker.dsl.OutputHandle;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
@@ -73,25 +73,35 @@ public class PublishArtifactExecutor implements RequestExecutor {
 
     private void publishArtifact(ArtifactStoreConfig artifactStoreConfig, ArtifactPlan artifactPlan) {
         try {
-            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactConfig.getAgentWorkingDir());
             final DockerClient docker = clientFactory.docker(artifactStoreConfig);
+            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactConfig.getAgentWorkingDir());
 
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
 
-            final DockerPushEventListener dockerPushEventListener = new DockerPushEventListener(publishArtifactResponse, image.toString());
-            OutputHandle handle = docker.image().withName(image.getImage())
-                    .push()
-                    .usingListener(dockerPushEventListener)
-                    .withTag(image.getTag())
-                    .force()
-                    .toRegistry();
+            if (!image.getImage().startsWith(artifactStoreConfig.getRegistryUrl())) {
+                throw new RuntimeException(String.format("Image is not tagged with repository url: %s", artifactStoreConfig.getRegistryUrl()));
+            }
 
-            dockerPushEventListener.await();
-            handle.close();
+            final DockerProgressHandler dockerProgressHandler = new DockerProgressHandler();
+            docker.push(image.toString(), dockerProgressHandler);
             docker.close();
+
+            if (dockerProgressHandler.getErrors().isEmpty()) {
+                publishArtifactResponse.addMetadata(artifactPlan.getId(), artifactMetadata(image, dockerProgressHandler.getDigest()));
+            } else {
+                throw new RuntimeException(String.join("\n", dockerProgressHandler.getErrors()));
+            }
+
         } catch (Exception e) {
-            publishArtifactResponse.addError(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
-            LOG.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
+            LOG.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()), e);
+            publishArtifactResponse.addError(String.format("Failed to publish %s: %s", artifactPlan, e));
         }
+    }
+
+    private HashMap<String, String> artifactMetadata(DockerImage image, String digest) {
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", image.toString());
+        artifactMetadata.put("digest", digest);
+        return artifactMetadata;
     }
 }

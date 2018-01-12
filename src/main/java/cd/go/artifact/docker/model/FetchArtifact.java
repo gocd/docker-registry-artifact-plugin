@@ -16,15 +16,22 @@
 
 package cd.go.artifact.docker.model;
 
-import cd.go.artifact.docker.annotation.Validatable;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-import static cd.go.artifact.docker.utils.Util.GSON;
+public class FetchArtifact {
+    @Expose
+    @SerializedName("artifact_id")
+    private String artifactId;
 
-public class FetchArtifactConfig implements Validatable {
-    public FetchArtifactConfig() {
+    public FetchArtifact() {
     }
 
-    public static FetchArtifactConfig fromJSON(String json) {
-        return GSON.fromJson(json, FetchArtifactConfig.class);
+    public FetchArtifact(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
     }
 }
