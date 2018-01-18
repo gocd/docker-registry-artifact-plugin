@@ -20,6 +20,7 @@ import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.model.FetchArtifact;
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -83,7 +84,7 @@ public class FetchArtifactExecutor implements RequestExecutor {
     }
 
     private Map<String, String> getArtifactMetadata(String artifactId) {
-        final String artifactJSON = (String) fetchArtifactRequest.getMetadata().get(artifactId);
+        final String artifactJSON = new Gson().toJson(fetchArtifactRequest.getMetadata().get(artifactId));
         if (StringUtils.isBlank(artifactJSON)) {
             throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", artifactId));
         }
