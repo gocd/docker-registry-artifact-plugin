@@ -78,10 +78,6 @@ public class PublishArtifactExecutor implements RequestExecutor {
 
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
 
-            if (!image.getImage().startsWith(artifactStoreConfig.getRegistryUrl())) {
-                throw new RuntimeException(String.format("Image is not tagged with repository url: %s", artifactStoreConfig.getRegistryUrl()));
-            }
-
             final DockerProgressHandler dockerProgressHandler = new DockerProgressHandler();
             docker.push(image.toString(), dockerProgressHandler);
             docker.close();
