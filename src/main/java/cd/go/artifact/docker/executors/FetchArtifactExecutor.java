@@ -16,19 +16,17 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.model.FetchArtifact;
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
@@ -39,15 +37,17 @@ import static java.lang.String.join;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
+    private final ConsoleLogger consoleLogger;
     private DockerClientFactory clientFactory;
     private final DockerProgressHandler dockerProgressHandler;
 
-    public FetchArtifactExecutor(GoPluginApiRequest request) {
-        this(request, DockerClientFactory.instance(), new DockerProgressHandler());
+    public FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
+        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
     }
 
-    FetchArtifactExecutor(GoPluginApiRequest request, DockerClientFactory clientFactory, DockerProgressHandler dockerProgressHandler) {
+    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler dockerProgressHandler, DockerClientFactory clientFactory) {
         this.fetchArtifactRequest = FetchArtifactRequest.fromJSON(request.requestBody());
+        this.consoleLogger = consoleLogger;
         this.clientFactory = clientFactory;
         this.dockerProgressHandler = dockerProgressHandler;
     }
@@ -56,7 +56,11 @@ public class FetchArtifactExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() {
         final String artifactId = fetchArtifactRequest.getFetchArtifact().getArtifactId();
         try {
-            final Map<String, String> artifactMap = getArtifactMetadata(artifactId);
+            final Map<String, String> artifactMap = (Map<String, String>) fetchArtifactRequest.getMetadata().get(artifactId);
+            if (artifactMap == null) {
+                throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", artifactId));
+            }
+
             fetch(artifactMap.get("image"));
 
             if (!dockerProgressHandler.getErrors().isEmpty()) {
@@ -70,27 +74,21 @@ public class FetchArtifactExecutor implements RequestExecutor {
             return DefaultGoPluginApiResponse.success("");
         } catch (Exception e) {
             final String message = format("Failed pull docker image: %s", e);
+            consoleLogger.error(message);
             LOG.error(message);
             return DefaultGoPluginApiResponse.error(message);
         }
     }
 
     private void fetch(String imageToPull) throws Exception {
+        consoleLogger.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
         LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
         DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
         docker.pull(imageToPull, dockerProgressHandler);
         docker.close();
-    }
 
-    private Map<String, String> getArtifactMetadata(String artifactId) {
-        final String artifactJSON = new Gson().toJson(fetchArtifactRequest.getMetadata().get(artifactId));
-        if (StringUtils.isBlank(artifactJSON)) {
-            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", artifactId));
-        }
-
-        return GSON.fromJson(artifactJSON, new TypeToken<Map<String, String>>() {
-        }.getType());
+        consoleLogger.info(format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
     }
 
     protected static class FetchArtifactRequest {

@@ -23,7 +23,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class GetPublishArtifactConfigMetadataExecutorTest {
+public class GetPublishArtifactRequestMetadataExecutorTest {
     @Test
     public void shouldReturnFetchArtifactMetadata() throws JSONException {
         final GoPluginApiResponse response = new GetPublishArtifactConfigMetadataExecutor().execute();

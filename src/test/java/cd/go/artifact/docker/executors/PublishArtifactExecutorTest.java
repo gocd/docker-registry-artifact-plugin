@@ -16,12 +16,13 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
-import cd.go.artifact.docker.model.ArtifactInfo;
 import cd.go.artifact.docker.model.ArtifactPlan;
+import cd.go.artifact.docker.model.ArtifactStore;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
-import cd.go.artifact.docker.model.PublishArtifactConfig;
+import cd.go.artifact.docker.model.PublishArtifactRequest;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.ProgressHandler;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
@@ -57,9 +58,11 @@ public class PublishArtifactExecutorTest {
     @Mock
     private GoPluginApiRequest request;
     @Mock
-    private DockerClientFactory dockerClientFactory;
+    private ConsoleLogger consoleLogger;
     @Mock
     private DefaultDockerClient dockerClient;
+    @Mock
+    private DockerClientFactory dockerClientFactory;
 
     private File agentWorkingDir;
 
@@ -73,40 +76,40 @@ public class PublishArtifactExecutorTest {
 
     @Test
     public void shouldPublishArtifact() throws IOException, DockerException, InterruptedException {
+        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final PublishArtifactConfig publishArtifactConfig = publishArtifactConfig(agentWorkingDir.getAbsolutePath(), storeConfig, new ArtifactPlan("id", "storeId", "build.json"));
+        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+
         Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build.json");
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
-        when(request.requestBody()).thenReturn(publishArtifactConfig.toJSON());
+        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
 
         verify(dockerClient).push(eq("localhost:5000/alpine:3.6"), any(ProgressHandler.class));
         assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"id\":{\"image\":\"localhost:5000/alpine:3.6\"}},\"errors\":[]}");
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\"},\"errors\":[]}");
     }
 
     @Test
     public void shouldAddErrorToPublishArtifactResponseWhenFailedToPublishImage() throws IOException, DockerException, InterruptedException {
+        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final PublishArtifactConfig publishArtifactConfig = publishArtifactConfig(agentWorkingDir.getAbsolutePath(), artifactStoreConfig, new ArtifactPlan("id", "storeId", "build.json"));
+        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), artifactStoreConfig);
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
         final ArgumentCaptor<DockerProgressHandler> argumentCaptor = ArgumentCaptor.forClass(DockerProgressHandler.class);
+
         Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build.json");
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
-        when(request.requestBody()).thenReturn(publishArtifactConfig.toJSON());
+        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
         doThrow(new RuntimeException("Some error")).when(dockerClient).push(eq("localhost:5000/alpine:3.6"), argumentCaptor.capture());
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(response.responseBody()).isEqualTo("{\"metadata\":{},\"errors\":[\"Failed to publish Artifact[id\\u003did, storeId\\u003dstoreId, buildFile\\u003dbuild.json]: java.lang.RuntimeException: Some error\"]}");
-    }
-
-    private PublishArtifactConfig publishArtifactConfig(String agentDir, ArtifactStoreConfig artifactStoreConfig, ArtifactPlan... artifactPlans) {
-        return new PublishArtifactConfig(agentDir,
-                new ArtifactInfo("storeId", artifactStoreConfig, artifactPlans)
-        );
     }
 }

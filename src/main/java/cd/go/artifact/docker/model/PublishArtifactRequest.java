@@ -19,60 +19,69 @@ package cd.go.artifact.docker.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static cd.go.artifact.docker.utils.Util.GSON;
 
-public class PublishArtifactConfig {
+public class PublishArtifactRequest {
     @Expose
     @SerializedName("agent_working_directory")
     private String agentWorkingDir;
 
     @Expose
-    @SerializedName("artifact_infos")
-    private List<ArtifactInfo> artifactInfos;
+    @SerializedName("artifact_store")
+    private ArtifactStore artifactStore;
 
-    public PublishArtifactConfig() {
+    @Expose
+    @SerializedName("artifact_plan")
+    private ArtifactPlan artifactPlan;
+
+    public PublishArtifactRequest() {
     }
 
-    public PublishArtifactConfig(String agentWorkingDir, ArtifactInfo... artifactInfos) {
+    public PublishArtifactRequest(ArtifactStore artifactStore, ArtifactPlan artifactPlan, String agentWorkingDir) {
         this.agentWorkingDir = agentWorkingDir;
-        this.artifactInfos = Arrays.asList(artifactInfos);
+        this.artifactStore = artifactStore;
+        this.artifactPlan = artifactPlan;
     }
 
     public String getAgentWorkingDir() {
         return agentWorkingDir;
     }
 
-    public List<ArtifactInfo> getArtifactInfos() {
-        return artifactInfos;
+    public ArtifactStore getArtifactStore() {
+        return artifactStore;
+    }
+
+    public ArtifactPlan getArtifactPlan() {
+        return artifactPlan;
+    }
+
+    public static PublishArtifactRequest fromJSON(String json) {
+        return GSON.fromJson(json, PublishArtifactRequest.class);
+    }
+
+    public String toJSON() {
+        return GSON.toJson(this);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PublishArtifactConfig)) return false;
+        if (!(o instanceof PublishArtifactRequest)) return false;
 
-        PublishArtifactConfig that = (PublishArtifactConfig) o;
+        PublishArtifactRequest that = (PublishArtifactRequest) o;
 
         if (agentWorkingDir != null ? !agentWorkingDir.equals(that.agentWorkingDir) : that.agentWorkingDir != null)
             return false;
-        return artifactInfos != null ? artifactInfos.equals(that.artifactInfos) : that.artifactInfos == null;
+        if (artifactStore != null ? !artifactStore.equals(that.artifactStore) : that.artifactStore != null)
+            return false;
+        return artifactPlan != null ? artifactPlan.equals(that.artifactPlan) : that.artifactPlan == null;
     }
 
     @Override
     public int hashCode() {
         int result = agentWorkingDir != null ? agentWorkingDir.hashCode() : 0;
-        result = 31 * result + (artifactInfos != null ? artifactInfos.hashCode() : 0);
+        result = 31 * result + (artifactStore != null ? artifactStore.hashCode() : 0);
+        result = 31 * result + (artifactPlan != null ? artifactPlan.hashCode() : 0);
         return result;
-    }
-
-    public static PublishArtifactConfig fromJSON(String json) {
-        return GSON.fromJson(json, PublishArtifactConfig.class);
-    }
-
-    public String toJSON() {
-        return GSON.toJson(this);
     }
 }

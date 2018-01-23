@@ -27,14 +27,25 @@ import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.lang.String.format;
 
 public class DockerProgressHandler implements ProgressHandler {
+    private final ConsoleLogger consoleLogger;
     private List<String> errors = new ArrayList<>();
     private String digest;
+
+    public DockerProgressHandler(ConsoleLogger consoleLogger) {
+        this.consoleLogger = consoleLogger;
+    }
 
     @Override
     public void progress(ProgressMessage message) {
         if (StringUtils.isNotBlank(message.error())) {
+            consoleLogger.error(message.error());
             LOG.error(format("Failure: %s", message.error()));
             errors.add(format("Failure: %s", message.error()));
+            return;
+        }
+
+        if (StringUtils.isNotBlank(message.progress())) {
+            consoleLogger.info(message.progress());
         }
 
         if (StringUtils.isNotBlank(message.digest())) {

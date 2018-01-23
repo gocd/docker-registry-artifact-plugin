@@ -37,6 +37,7 @@ import static cd.go.artifact.docker.Constants.PLUGIN_IDENTIFIER;
 public class DockerArtifactPlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(cd.go.artifact.docker.DockerArtifactPlugin.class);
     private GoApplicationAccessor accessor;
+    private ConsoleLogger consoleLogger;
 
     @Load
     public void onLoad(PluginContext ctx) {
@@ -47,6 +48,7 @@ public class DockerArtifactPlugin implements GoPlugin {
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {
         this.accessor = accessor;
+        consoleLogger = ConsoleLogger.getLogger(accessor);
     }
 
     @Override
@@ -74,9 +76,9 @@ public class DockerArtifactPlugin implements GoPlugin {
                 case REQUEST_FETCH_ARTIFACT_VALIDATE:
                     return new ValidateFetchArtifactConfigExecutor().execute();
                 case REQUEST_PUBLISH_ARTIFACT:
-                    return new PublishArtifactExecutor(request).execute();
+                    return new PublishArtifactExecutor(request, consoleLogger).execute();
                 case REQUEST_FETCH_ARTIFACT:
-                    return new FetchArtifactExecutor(request).execute();
+                    return new FetchArtifactExecutor(request, consoleLogger).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
