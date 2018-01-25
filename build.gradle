@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'java'
+apply from: 'plugin-common.gradle'
 
 group = 'cd.go.artifact.docker'
 version = '0.0.1'

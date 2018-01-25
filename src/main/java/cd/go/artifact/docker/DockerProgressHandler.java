@@ -20,15 +20,11 @@ import com.spotify.docker.client.ProgressHandler;
 import com.spotify.docker.client.messages.ProgressMessage;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.lang.String.format;
 
 public class DockerProgressHandler implements ProgressHandler {
     private final ConsoleLogger consoleLogger;
-    private List<String> errors = new ArrayList<>();
     private String digest;
 
     public DockerProgressHandler(ConsoleLogger consoleLogger) {
@@ -40,8 +36,7 @@ public class DockerProgressHandler implements ProgressHandler {
         if (StringUtils.isNotBlank(message.error())) {
             consoleLogger.error(message.error());
             LOG.error(format("Failure: %s", message.error()));
-            errors.add(format("Failure: %s", message.error()));
-            return;
+            throw new RuntimeException(message.error());
         }
 
         if (StringUtils.isNotBlank(message.progress())) {
@@ -55,9 +50,5 @@ public class DockerProgressHandler implements ProgressHandler {
 
     public String getDigest() {
         return digest;
-    }
-
-    public List<String> getErrors() {
-        return errors;
     }
 }

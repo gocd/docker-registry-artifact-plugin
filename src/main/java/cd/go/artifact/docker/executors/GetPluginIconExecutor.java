@@ -33,8 +33,7 @@ public class GetPluginIconExecutor implements RequestExecutor {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("content_type", getContentType());
         jsonObject.addProperty("data", Base64.getEncoder().encodeToString(Util.readResourceBytes(getIcon())));
-        DefaultGoPluginApiResponse defaultGoPluginApiResponse = DefaultGoPluginApiResponse.success(GSON.toJson(jsonObject));
-        return defaultGoPluginApiResponse;
+        return DefaultGoPluginApiResponse.success(GSON.toJson(jsonObject));
     }
 
     private String getContentType() {

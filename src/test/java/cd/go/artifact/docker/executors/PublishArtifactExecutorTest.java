@@ -60,6 +60,8 @@ public class PublishArtifactExecutorTest {
     @Mock
     private ConsoleLogger consoleLogger;
     @Mock
+    private DockerProgressHandler dockerProgressHandler;
+    @Mock
     private DefaultDockerClient dockerClient;
     @Mock
     private DockerClientFactory dockerClientFactory;
@@ -85,12 +87,13 @@ public class PublishArtifactExecutorTest {
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         verify(dockerClient).push(eq("localhost:5000/alpine:3.6"), any(ProgressHandler.class));
         assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\"},\"errors\":[]}");
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\",\"digest\":\"foo\"}}");
     }
 
     @Test
@@ -107,9 +110,9 @@ public class PublishArtifactExecutorTest {
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
         doThrow(new RuntimeException("Some error")).when(dockerClient).push(eq("localhost:5000/alpine:3.6"), argumentCaptor.capture());
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
-        assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{},\"errors\":[\"Failed to publish Artifact[id\\u003did, storeId\\u003dstoreId, buildFile\\u003dbuild.json]: java.lang.RuntimeException: Some error\"]}");
+        assertThat(response.responseCode()).isEqualTo(500);
+        assertThat(response.responseBody()).contains("Failed to publish Artifact[id=id, storeId=storeId, buildFile=build.json]: Some error");
     }
 }

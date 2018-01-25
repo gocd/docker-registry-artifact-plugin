@@ -20,10 +20,10 @@ import cd.go.artifact.docker.annotation.Validatable;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.utils.Util;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +33,7 @@ public class GetArtifactStoreViewExecutorTest extends ViewTest {
     public void shouldRenderTheTemplateInJSON() throws Exception {
         GoPluginApiResponse response = getRequestExecutor().execute();
 
-        Map<String, String> responseHash = new Gson().fromJson(response.responseBody(), HashMap.class);
+        Map<String, String> responseHash = new Gson().fromJson(response.responseBody(), new TypeToken<Map<String,String>>(){}.getType());
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(responseHash).containsEntry("template", Util.readResource("/artifact-store.template.html"));

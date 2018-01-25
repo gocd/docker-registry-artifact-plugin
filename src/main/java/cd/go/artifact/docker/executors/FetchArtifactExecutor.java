@@ -20,7 +20,6 @@ import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
-import cd.go.artifact.docker.model.FetchArtifact;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.spotify.docker.client.DockerClient;
@@ -33,7 +32,6 @@ import java.util.Map;
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static cd.go.artifact.docker.utils.Util.GSON;
 import static java.lang.String.format;
-import static java.lang.String.join;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
@@ -54,18 +52,20 @@ public class FetchArtifactExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() {
-        final String artifactId = fetchArtifactRequest.getFetchArtifact().getArtifactId();
         try {
-            final Map<String, String> artifactMap = (Map<String, String>) fetchArtifactRequest.getMetadata().get(artifactId);
-            if (artifactMap == null) {
-                throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", artifactId));
-            }
+            final Map<String, String> artifactMap = fetchArtifactRequest.getMetadata();
+            validateMetadata(artifactMap);
 
-            fetch(artifactMap.get("image"));
+            final String imageToPull = artifactMap.get("image");
 
-            if (!dockerProgressHandler.getErrors().isEmpty()) {
-                throw new RuntimeException(join("\n", dockerProgressHandler.getErrors()));
-            }
+            consoleLogger.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+            LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+
+            DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
+            docker.pull(imageToPull, dockerProgressHandler);
+            docker.close();
+
+            consoleLogger.info(format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
             if (!dockerProgressHandler.getDigest().equals(artifactMap.get("digest"))) {
                 throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
@@ -80,15 +80,18 @@ public class FetchArtifactExecutor implements RequestExecutor {
         }
     }
 
-    private void fetch(String imageToPull) throws Exception {
-        consoleLogger.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
-        LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+    public void validateMetadata(Map<String, String> artifactMap) {
+        if (artifactMap == null) {
+            throw new RuntimeException(format("Invalid metadata received from server. It can not be null."));
+        }
 
-        DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-        docker.pull(imageToPull, dockerProgressHandler);
-        docker.close();
+        if (!artifactMap.containsKey("image")) {
+            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "image"));
+        }
 
-        consoleLogger.info(format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+        if (!artifactMap.containsKey("digest")) {
+            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "digest"));
+        }
     }
 
     protected static class FetchArtifactRequest {
@@ -96,18 +99,11 @@ public class FetchArtifactExecutor implements RequestExecutor {
         @SerializedName("store_configuration")
         private ArtifactStoreConfig artifactStoreConfig;
         @Expose
-        @SerializedName("fetch_artifact")
-        private FetchArtifact fetchArtifact;
-        @Expose
         @SerializedName("artifact_metadata")
-        private Map<String, Object> metadata;
+        private Map<String, String> metadata;
 
-        public FetchArtifactRequest() {
-        }
-
-        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, String artifactId, Map<String, Object> metadata) {
+        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, Map<String, String> metadata) {
             this.artifactStoreConfig = artifactStoreConfig;
-            this.fetchArtifact = new FetchArtifact(artifactId);
             this.metadata = metadata;
         }
 
@@ -115,11 +111,7 @@ public class FetchArtifactExecutor implements RequestExecutor {
             return artifactStoreConfig;
         }
 
-        public FetchArtifact getFetchArtifact() {
-            return fetchArtifact;
-        }
-
-        public Map<String, Object> getMetadata() {
+        public Map<String, String> getMetadata() {
             return metadata;
         }
 

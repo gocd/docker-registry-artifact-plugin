@@ -32,27 +32,25 @@ public class PublishArtifactExecutor implements RequestExecutor {
     private final PublishArtifactRequest publishArtifactRequest;
     private final PublishArtifactResponse publishArtifactResponse;
     private final ConsoleLogger consoleLogger;
+    private final DockerProgressHandler progressHandler;
     private final DockerClientFactory clientFactory;
 
     public PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
-        this(request, consoleLogger, DockerClientFactory.instance());
+        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
     }
 
-    PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerClientFactory clientFactory) {
+    PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler progressHandler, DockerClientFactory clientFactory) {
         this.publishArtifactRequest = PublishArtifactRequest.fromJSON(request.requestBody());
         this.consoleLogger = consoleLogger;
+        this.progressHandler = progressHandler;
         this.clientFactory = clientFactory;
         publishArtifactResponse = new PublishArtifactResponse();
     }
 
     @Override
     public GoPluginApiResponse execute() {
-        publishArtifact(publishArtifactRequest.getArtifactStore(), publishArtifactRequest.getArtifactPlan());
-        return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
-    }
-
-    private void publishArtifact(ArtifactStore artifactStore, ArtifactPlan artifactPlan) {
-        final ArtifactStoreConfig artifactStoreConfig = artifactStore.getArtifactStoreConfig();
+        ArtifactPlan artifactPlan = publishArtifactRequest.getArtifactPlan();
+        final ArtifactStoreConfig artifactStoreConfig = publishArtifactRequest.getArtifactStore().getArtifactStoreConfig();
         try {
             final DockerClient docker = clientFactory.docker(artifactStoreConfig);
             final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir());
@@ -60,22 +58,17 @@ public class PublishArtifactExecutor implements RequestExecutor {
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
             consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
 
-            final DockerProgressHandler progressHandler = new DockerProgressHandler(consoleLogger);
             docker.push(image.toString(), progressHandler);
             docker.close();
 
-            if (progressHandler.getErrors().isEmpty()) {
-                publishArtifactResponse.addMetadata("image", image.toString());
-                publishArtifactResponse.addMetadata("digest", progressHandler.getDigest());
-                consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
-            } else {
-                throw new RuntimeException(String.join("\n", progressHandler.getErrors()));
-            }
-
+            publishArtifactResponse.addMetadata("image", image.toString());
+            publishArtifactResponse.addMetadata("digest", progressHandler.getDigest());
+            consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
+            return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
         } catch (Exception e) {
             consoleLogger.error(String.format("Failed to publish %s: %s", artifactPlan, e));
             LOG.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()), e);
-            publishArtifactResponse.addError(String.format("Failed to publish %s: %s", artifactPlan, e));
+            return DefaultGoPluginApiResponse.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
         }
     }
 }

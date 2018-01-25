@@ -32,14 +32,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 import static cd.go.artifact.docker.executors.FetchArtifactExecutor.FetchArtifactRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -71,8 +69,7 @@ public class FetchArtifactExecutorTest {
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", artifactMetadata);
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("foo");
@@ -89,8 +86,7 @@ public class FetchArtifactExecutorTest {
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", artifactMetadata);
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("bar");
@@ -102,16 +98,15 @@ public class FetchArtifactExecutorTest {
     }
 
     @Test
-    public void shouldErrorOutWhenFailedToPull() {
+    public void shouldErrorOutWhenFailedToPull() throws DockerException, InterruptedException {
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", artifactMetadata);
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
-        when(dockerProgressHandler.getErrors()).thenReturn(Arrays.asList("Some error"));
+        doThrow(new RuntimeException("Some error")).when(dockerClient).pull("localhost:5000/alpine:v1", dockerProgressHandler);
 
         final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
