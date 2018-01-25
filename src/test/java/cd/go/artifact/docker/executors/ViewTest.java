@@ -20,13 +20,13 @@ import cd.go.artifact.docker.annotation.ConfigMetadata;
 import cd.go.artifact.docker.annotation.MetadataHelper;
 import cd.go.artifact.docker.annotation.Validatable;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +59,7 @@ public abstract class ViewTest {
 
     private Document getDocument() throws Exception {
         final GoPluginApiResponse response = getRequestExecutor().execute();
-        final Map<String, String> responseHash = new Gson().fromJson(response.responseBody(), HashMap.class);
+        final Map<String, String> responseHash = new Gson().fromJson(response.responseBody(), new TypeToken<Map<String,String>>(){}.getType());
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(responseHash).containsKey("template");

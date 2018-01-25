@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ValidatePublishArtifactConfigExecutorTest {
+public class ValidatePublishArtifactRequestExecutorTest {
     @Mock
     private GoPluginApiRequest request;
 

@@ -82,7 +82,7 @@ public class ArtifactPlanConfigTest {
     }
 
     @Test
-    public void shouldErrorOutWhenFileDoesNotExist() throws IOException {
+    public void shouldErrorOutWhenFileDoesNotExist() {
         final ArtifactPlanConfig artifactPlanConfig = new ArtifactPlanConfig("random.json");
 
         thrown.expect(RuntimeException.class);

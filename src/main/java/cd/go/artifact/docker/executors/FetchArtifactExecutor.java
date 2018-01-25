@@ -16,52 +16,56 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
-import cd.go.artifact.docker.model.FetchArtifact;
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static cd.go.artifact.docker.utils.Util.GSON;
 import static java.lang.String.format;
-import static java.lang.String.join;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
+    private final ConsoleLogger consoleLogger;
     private DockerClientFactory clientFactory;
     private final DockerProgressHandler dockerProgressHandler;
 
-    public FetchArtifactExecutor(GoPluginApiRequest request) {
-        this(request, DockerClientFactory.instance(), new DockerProgressHandler());
+    public FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
+        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
     }
 
-    FetchArtifactExecutor(GoPluginApiRequest request, DockerClientFactory clientFactory, DockerProgressHandler dockerProgressHandler) {
+    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler dockerProgressHandler, DockerClientFactory clientFactory) {
         this.fetchArtifactRequest = FetchArtifactRequest.fromJSON(request.requestBody());
+        this.consoleLogger = consoleLogger;
         this.clientFactory = clientFactory;
         this.dockerProgressHandler = dockerProgressHandler;
     }
 
     @Override
     public GoPluginApiResponse execute() {
-        final String artifactId = fetchArtifactRequest.getFetchArtifact().getArtifactId();
         try {
-            final Map<String, String> artifactMap = getArtifactMetadata(artifactId);
-            fetch(artifactMap.get("image"));
+            final Map<String, String> artifactMap = fetchArtifactRequest.getMetadata();
+            validateMetadata(artifactMap);
 
-            if (!dockerProgressHandler.getErrors().isEmpty()) {
-                throw new RuntimeException(join("\n", dockerProgressHandler.getErrors()));
-            }
+            final String imageToPull = artifactMap.get("image");
+
+            consoleLogger.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+            LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+
+            DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
+            docker.pull(imageToPull, dockerProgressHandler);
+            docker.close();
+
+            consoleLogger.info(format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
             if (!dockerProgressHandler.getDigest().equals(artifactMap.get("digest"))) {
                 throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
@@ -70,27 +74,24 @@ public class FetchArtifactExecutor implements RequestExecutor {
             return DefaultGoPluginApiResponse.success("");
         } catch (Exception e) {
             final String message = format("Failed pull docker image: %s", e);
+            consoleLogger.error(message);
             LOG.error(message);
             return DefaultGoPluginApiResponse.error(message);
         }
     }
 
-    private void fetch(String imageToPull) throws Exception {
-        LOG.info(format("Pulling docker image `%s` to docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
-
-        DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-        docker.pull(imageToPull, dockerProgressHandler);
-        docker.close();
-    }
-
-    private Map<String, String> getArtifactMetadata(String artifactId) {
-        final String artifactJSON = new Gson().toJson(fetchArtifactRequest.getMetadata().get(artifactId));
-        if (StringUtils.isBlank(artifactJSON)) {
-            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", artifactId));
+    public void validateMetadata(Map<String, String> artifactMap) {
+        if (artifactMap == null) {
+            throw new RuntimeException(format("Invalid metadata received from server. It can not be null."));
         }
 
-        return GSON.fromJson(artifactJSON, new TypeToken<Map<String, String>>() {
-        }.getType());
+        if (!artifactMap.containsKey("image")) {
+            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "image"));
+        }
+
+        if (!artifactMap.containsKey("digest")) {
+            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "digest"));
+        }
     }
 
     protected static class FetchArtifactRequest {
@@ -98,18 +99,11 @@ public class FetchArtifactExecutor implements RequestExecutor {
         @SerializedName("store_configuration")
         private ArtifactStoreConfig artifactStoreConfig;
         @Expose
-        @SerializedName("fetch_artifact")
-        private FetchArtifact fetchArtifact;
-        @Expose
         @SerializedName("artifact_metadata")
-        private Map<String, Object> metadata;
+        private Map<String, String> metadata;
 
-        public FetchArtifactRequest() {
-        }
-
-        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, String artifactId, Map<String, Object> metadata) {
+        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, Map<String, String> metadata) {
             this.artifactStoreConfig = artifactStoreConfig;
-            this.fetchArtifact = new FetchArtifact(artifactId);
             this.metadata = metadata;
         }
 
@@ -117,11 +111,7 @@ public class FetchArtifactExecutor implements RequestExecutor {
             return artifactStoreConfig;
         }
 
-        public FetchArtifact getFetchArtifact() {
-            return fetchArtifact;
-        }
-
-        public Map<String, Object> getMetadata() {
+        public Map<String, String> getMetadata() {
             return metadata;
         }
 

@@ -21,7 +21,6 @@ import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.RegistryAuth;
 
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.text.MessageFormat.format;
@@ -38,12 +37,8 @@ public class DockerClientFactory {
     }
 
     private static DefaultDockerClient createClient(ArtifactStoreConfig artifactStoreConfig) throws DockerCertificateException, DockerException, InterruptedException {
-        final RegistryAuth registryAuth = RegistryAuth.builder()
-                .username(artifactStoreConfig.getUsername())
-                .serverAddress(artifactStoreConfig.getRegistryUrl())
-                .password(artifactStoreConfig.getPassword()).build();
-
-        DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuth(registryAuth).build();
+        final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig);
+        DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuthSupplier(registryAuthSupplier).build();
 
         LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getRegistryUrl()));
 

@@ -22,7 +22,7 @@ import com.google.gson.annotations.SerializedName;
 
 import static cd.go.artifact.docker.utils.Util.isNotBlank;
 
-public class ConfigMetadata<T extends Metadata> {
+public class ConfigMetadata {
 
     @Expose
     @SerializedName("key")
@@ -30,9 +30,9 @@ public class ConfigMetadata<T extends Metadata> {
 
     @Expose
     @SerializedName("metadata")
-    private T metadata;
+    private FieldMetadata metadata;
 
-    public ConfigMetadata(String key, T metadata) {
+    public ConfigMetadata(String key, FieldMetadata metadata) {
         this.key = key;
         this.metadata = metadata;
     }

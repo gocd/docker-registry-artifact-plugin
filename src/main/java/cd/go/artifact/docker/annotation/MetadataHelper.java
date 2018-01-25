@@ -18,7 +18,8 @@ package cd.go.artifact.docker.annotation;
 
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MetadataHelper {
 
@@ -33,7 +34,7 @@ public class MetadataHelper {
             ProfileField profileField = field.getAnnotation(ProfileField.class);
             if (profileField != null) {
                 final FieldMetadata fieldMetadata = new FieldMetadata(profileField.required(), profileField.secure(), profileField.type());
-                final ConfigMetadata<FieldMetadata> configMetadata = new ConfigMetadata<>(profileField.key(), fieldMetadata);
+                final ConfigMetadata configMetadata = new ConfigMetadata(profileField.key(), fieldMetadata);
                 metadata.add(configMetadata);
             }
         }

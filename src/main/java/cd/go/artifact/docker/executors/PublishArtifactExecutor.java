@@ -16,6 +16,7 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.*;
@@ -24,80 +25,50 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import java.util.HashMap;
-import java.util.List;
-
 import static cd.go.artifact.docker.DockerArtifactPlugin.LOG;
 import static java.lang.String.format;
 
 public class PublishArtifactExecutor implements RequestExecutor {
-    private final PublishArtifactConfig publishArtifactConfig;
+    private final PublishArtifactRequest publishArtifactRequest;
     private final PublishArtifactResponse publishArtifactResponse;
+    private final ConsoleLogger consoleLogger;
+    private final DockerProgressHandler progressHandler;
     private final DockerClientFactory clientFactory;
 
-    public PublishArtifactExecutor(GoPluginApiRequest request) {
-        this(request, DockerClientFactory.instance());
+    public PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
+        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
     }
 
-    PublishArtifactExecutor(GoPluginApiRequest request, DockerClientFactory clientFactory) {
-        this.publishArtifactConfig = PublishArtifactConfig.fromJSON(request.requestBody());
+    PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler progressHandler, DockerClientFactory clientFactory) {
+        this.publishArtifactRequest = PublishArtifactRequest.fromJSON(request.requestBody());
+        this.consoleLogger = consoleLogger;
+        this.progressHandler = progressHandler;
         this.clientFactory = clientFactory;
         publishArtifactResponse = new PublishArtifactResponse();
     }
 
     @Override
     public GoPluginApiResponse execute() {
-        publish(publishArtifactConfig);
-        return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
-    }
-
-    private void publish(PublishArtifactConfig publishArtifactConfigs) {
-        if (publishArtifactConfigs == null || publishArtifactConfigs.getArtifactInfos().isEmpty()) {
-            publishArtifactResponse.addError("No artifact to publish.");
-            return;
-        }
-
-        for (ArtifactInfo artifactInfo : publishArtifactConfigs.getArtifactInfos()) {
-            publishArtifactsToArtifactStore(artifactInfo);
-        }
-    }
-
-    private void publishArtifactsToArtifactStore(ArtifactInfo artifactInfo) {
-        final ArtifactStoreConfig artifactStoreConfig = artifactInfo.getArtifactStoreConfig();
-        final List<ArtifactPlan> artifactPlans = artifactInfo.getArtifactPlans();
-
-        for (ArtifactPlan artifactPlan : artifactPlans) {
-            publishArtifact(artifactStoreConfig, artifactPlan);
-        }
-    }
-
-    private void publishArtifact(ArtifactStoreConfig artifactStoreConfig, ArtifactPlan artifactPlan) {
+        ArtifactPlan artifactPlan = publishArtifactRequest.getArtifactPlan();
+        final ArtifactStoreConfig artifactStoreConfig = publishArtifactRequest.getArtifactStore().getArtifactStoreConfig();
         try {
             final DockerClient docker = clientFactory.docker(artifactStoreConfig);
-            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactConfig.getAgentWorkingDir());
+            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir());
 
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
+            consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
 
-            final DockerProgressHandler dockerProgressHandler = new DockerProgressHandler();
-            docker.push(image.toString(), dockerProgressHandler);
+            docker.push(image.toString(), progressHandler);
             docker.close();
 
-            if (dockerProgressHandler.getErrors().isEmpty()) {
-                publishArtifactResponse.addMetadata(artifactPlan.getId(), artifactMetadata(image, dockerProgressHandler.getDigest()));
-            } else {
-                throw new RuntimeException(String.join("\n", dockerProgressHandler.getErrors()));
-            }
-
+            publishArtifactResponse.addMetadata("image", image.toString());
+            publishArtifactResponse.addMetadata("digest", progressHandler.getDigest());
+            consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
+            return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
         } catch (Exception e) {
+            consoleLogger.error(String.format("Failed to publish %s: %s", artifactPlan, e));
             LOG.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()), e);
-            publishArtifactResponse.addError(String.format("Failed to publish %s: %s", artifactPlan, e));
+            return DefaultGoPluginApiResponse.error(String.format("Failed to publish %s: %s", artifactPlan, e.getMessage()));
         }
-    }
-
-    private HashMap<String, String> artifactMetadata(DockerImage image, String digest) {
-        final HashMap<String, String> artifactMetadata = new HashMap<>();
-        artifactMetadata.put("image", image.toString());
-        artifactMetadata.put("digest", digest);
-        return artifactMetadata;
     }
 }

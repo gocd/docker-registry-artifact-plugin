@@ -33,4 +33,5 @@ public interface Constants {
     // requests that the plugin makes to the server
     String REQUEST_SERVER_PREFIX = "go.processor";
     String REQUEST_SERVER_GET_PLUGIN_SETTINGS = REQUEST_SERVER_PREFIX + ".plugin-settings.get";
+    String SEND_CONSOLE_LOG = "go.processor.artifact.console-log";
 }

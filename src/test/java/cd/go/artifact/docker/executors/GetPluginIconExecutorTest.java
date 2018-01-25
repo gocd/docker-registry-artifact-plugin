@@ -18,11 +18,12 @@ package cd.go.artifact.docker.executors;
 
 import cd.go.artifact.docker.utils.Util;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +31,7 @@ public class GetPluginIconExecutorTest {
     @Test
     public void rendersIconInBase64() {
         GoPluginApiResponse response = new GetPluginIconExecutor().execute();
-        HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), HashMap.class);
+        Map<String, String> hashMap = new Gson().fromJson(response.responseBody(), new TypeToken<Map<String,String>>(){}.getType());
         assertThat(hashMap).hasSize(2);
         assertThat(hashMap.get("content_type")).isEqualTo("image/svg+xml");
         assertThat(Util.readResourceBytes("/plugin-icon.svg")).isEqualTo(Base64.getDecoder().decode(hashMap.get("data")));

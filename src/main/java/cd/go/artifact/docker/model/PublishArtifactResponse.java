@@ -21,44 +21,25 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PublishArtifactResponse {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().serializeNulls().create();
 
     public PublishArtifactResponse() {
-    }
-
-    public PublishArtifactResponse(Map<String, Object> metadata, List<String> errors) {
-        this.metadata = metadata;
-        this.errors = errors;
     }
 
     @Expose
     @SerializedName("metadata")
     private Map<String, Object> metadata = new HashMap<>();
 
-    @Expose
-    @SerializedName("errors")
-    private List<String> errors = new ArrayList<>();
-
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public List<String> getErrors() {
-        return errors;
-    }
-
     public void addMetadata(String key, Object value) {
         this.metadata.put(key, value);
-    }
-
-    public void addError(String error) {
-        this.errors.add(error);
     }
 
     public String toJSON() {

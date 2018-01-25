@@ -16,6 +16,7 @@
 
 package cd.go.artifact.docker.executors;
 
+import cd.go.artifact.docker.ConsoleLogger;
 import cd.go.artifact.docker.DockerClientFactory;
 import cd.go.artifact.docker.DockerProgressHandler;
 import cd.go.artifact.docker.model.ArtifactStoreConfig;
@@ -31,12 +32,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.HashMap;
 
+import static cd.go.artifact.docker.executors.FetchArtifactExecutor.FetchArtifactRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -52,6 +53,8 @@ public class FetchArtifactExecutorTest {
     private DefaultDockerClient dockerClient;
     @Mock
     private DockerProgressHandler dockerProgressHandler;
+    @Mock
+    private ConsoleLogger consoleLogger;
 
     @Before
     public void setUp() throws InterruptedException, DockerException, DockerCertificateException {
@@ -63,13 +66,15 @@ public class FetchArtifactExecutorTest {
     @Test
     public void shouldFetchArtifact() {
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", "{\"image\":\"localhost:5000/alpine:v1\", \"digest\":\"foo\"}");
-        final FetchArtifactExecutor.FetchArtifactRequest fetchArtifactRequest = new FetchArtifactExecutor.FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", "localhost:5000/alpine:v1");
+        artifactMetadata.put("digest", "foo");
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("foo");
 
-        final GoPluginApiResponse response = new FetchArtifactExecutor(request, dockerClientFactory, dockerProgressHandler).execute();
+        final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(response.responseBody()).isEqualTo("");
@@ -78,28 +83,32 @@ public class FetchArtifactExecutorTest {
     @Test
     public void shouldErrorOutWhenDigestIsNotSame() {
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", "{\"image\":\"localhost:5000/alpine:v1\", \"digest\":\"foo\"}");
-        final FetchArtifactExecutor.FetchArtifactRequest fetchArtifactRequest = new FetchArtifactExecutor.FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", "localhost:5000/alpine:v1");
+        artifactMetadata.put("digest", "foo");
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("bar");
 
-        final GoPluginApiResponse response = new FetchArtifactExecutor(request, dockerClientFactory, dockerProgressHandler).execute();
+        final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(500);
         assertThat(response.responseBody()).isEqualTo("Failed pull docker image: java.lang.RuntimeException: Expecting pulled image digest to be [foo] but it is [bar].");
     }
 
     @Test
-    public void shouldErrorOutWhenFailedToPull() {
+    public void shouldErrorOutWhenFailedToPull() throws DockerException, InterruptedException {
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final Map<String, Object> metadata = Collections.singletonMap("artifactId", "{\"image\":\"localhost:5000/alpine:v1\", \"digest\":\"foo\"}");
-        final FetchArtifactExecutor.FetchArtifactRequest fetchArtifactRequest = new FetchArtifactExecutor.FetchArtifactRequest(storeConfig, "artifactId", metadata);
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", "localhost:5000/alpine:v1");
+        artifactMetadata.put("digest", "foo");
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
-        when(dockerProgressHandler.getErrors()).thenReturn(Arrays.asList("Some error"));
+        doThrow(new RuntimeException("Some error")).when(dockerClient).pull("localhost:5000/alpine:v1", dockerProgressHandler);
 
-        final GoPluginApiResponse response = new FetchArtifactExecutor(request, dockerClientFactory, dockerProgressHandler).execute();
+        final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(500);
         assertThat(response.responseBody()).isEqualTo("Failed pull docker image: java.lang.RuntimeException: Some error");
