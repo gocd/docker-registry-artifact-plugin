@@ -21,6 +21,7 @@ package cd.go.artifact.docker;
  */
 public enum Request {
     REQUEST_GET_PLUGIN_ICON(String.join(".", "cd.go.artifact", "get-icon")),
+    REQUEST_GET_PLUGIN_CAPABILITIES(String.join(".", "cd.go.artifact", "get-capabilities")),
 
     REQUEST_STORE_CONFIG_METADATA(String.join(".", "cd.go.artifact", "store", "get-metadata")),
     REQUEST_STORE_CONFIG_VIEW(String.join(".", "cd.go.artifact", "store", "get-view")),
