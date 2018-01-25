@@ -36,7 +36,6 @@ import static cd.go.artifact.docker.Constants.PLUGIN_IDENTIFIER;
 @Extension
 public class DockerArtifactPlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(cd.go.artifact.docker.DockerArtifactPlugin.class);
-    private GoApplicationAccessor accessor;
     private ConsoleLogger consoleLogger;
 
     @Load
@@ -47,7 +46,6 @@ public class DockerArtifactPlugin implements GoPlugin {
 
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {
-        this.accessor = accessor;
         consoleLogger = ConsoleLogger.getLogger(accessor);
     }
 
@@ -57,6 +55,8 @@ public class DockerArtifactPlugin implements GoPlugin {
             switch (Request.fromString(request.requestName())) {
                 case REQUEST_GET_PLUGIN_ICON:
                     return new GetPluginIconExecutor().execute();
+                case REQUEST_GET_PLUGIN_CAPABILITIES:
+                    return new GetCapabilitiesExecutor().execute();
                 case REQUEST_STORE_CONFIG_METADATA:
                     return new GetArtifactStoreConfigMetadataExecutor().execute();
                 case REQUEST_STORE_CONFIG_VIEW:
