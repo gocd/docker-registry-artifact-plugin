@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,19 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-registry-artifact-plugin'
+package cd.go.artifact.docker.registry.model;
+
+import static cd.go.artifact.docker.registry.utils.Util.GSON;
+
+public class Capabilities {
+    public Capabilities() {
+    }
+
+    public static Capabilities fromJSON(String json) {
+        return GSON.fromJson(json, Capabilities.class);
+    }
+
+    public String toJSON() {
+        return GSON.toJson(this);
+    }
+}

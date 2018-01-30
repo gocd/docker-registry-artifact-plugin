@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,21 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-registry-artifact-plugin'
+package cd.go.artifact.docker.registry;
+
+public class DockerPullResponse {
+    private Throwable throwable;
+
+    public void exception(Throwable throwable) {
+        this.throwable = throwable;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+
+    public boolean hasException() {
+        return throwable != null;
+    }
+}

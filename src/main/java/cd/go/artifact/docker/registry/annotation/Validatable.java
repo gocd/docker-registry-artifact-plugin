@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,20 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-registry-artifact-plugin'
+package cd.go.artifact.docker.registry.annotation;
+
+import cd.go.artifact.docker.registry.utils.Util;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.Map;
+
+public interface Validatable {
+    default String toJSON() {
+        return Util.GSON.toJson(this);
+    }
+
+    default Map<String, String> toProperties() {
+        return Util.GSON.fromJson(toJSON(), new TypeToken<Map<String, String>>() {
+        }.getType());
+    }
+}
