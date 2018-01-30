@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,24 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-registry-artifact-plugin'
+package cd.go.artifact.docker.registry.model;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+public class FetchArtifact {
+    @Expose
+    @SerializedName("artifact_id")
+    private String artifactId;
+
+    public FetchArtifact() {
+    }
+
+    public FetchArtifact(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+}

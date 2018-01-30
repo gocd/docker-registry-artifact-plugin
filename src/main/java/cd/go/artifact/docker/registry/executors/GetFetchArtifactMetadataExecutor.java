@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,17 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-registry-artifact-plugin'
+package cd.go.artifact.docker.registry.executors;
+
+import cd.go.artifact.docker.registry.utils.Util;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
+import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+
+import java.util.ArrayList;
+
+public class GetFetchArtifactMetadataExecutor implements RequestExecutor {
+    public GoPluginApiResponse execute() {
+        return DefaultGoPluginApiResponse.success(Util.GSON.toJson(new ArrayList<>()));
+    }
+}
+
