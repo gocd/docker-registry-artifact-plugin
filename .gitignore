@@ -10,4 +10,4 @@ build/
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 out
-artifact-skeleton-plugin.iml
+docker-registry-artifact-plugin.iml

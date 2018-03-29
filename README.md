@@ -1,4 +1,4 @@
-# Artifact plugin skeleton
+# Docker Reigistry Artifact plugin
 
 This is merely a skeleton plugin that plugin developers can fork to get quickly
 started with writing artifact plugins for GoCD.
