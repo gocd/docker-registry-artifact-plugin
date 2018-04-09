@@ -14,14 +14,44 @@
  * limitations under the License.
  */
 
+plugins {
+    id 'co.riiid.gradle' version '0.4.2'
+}
+
 apply plugin: 'java'
 apply from: 'plugin-common.gradle'
 
-project.ext.pluginVersion = '0.0.1'
-project.ext.fullVersion = project.distVersion ? "${project.pluginVersion}-${project.distVersion}" : project.pluginVersion
+def gitRevision = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "log", "-n", "1", "--format=%H"
+        standardOutput = hashStdOut
+    }
+
+    return hashStdOut.toString().trim()
+}
+
+def releaseRevision = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "log", "--pretty=format:"
+        standardOutput = hashStdOut
+    }
+
+    return hashStdOut.size().toString()
+}
+
+def PLUGIN_VERSION = '0.0.1'
+def DIST_VERSION = releaseRevision()
+def GIT_REVISION = gitRevision()
 
 group = 'cd.go.artifact.docker'
+project.ext.pluginVersion = PLUGIN_VERSION
+rootProject.ext.distVersion = DIST_VERSION
+rootProject.ext.fullVersion = DIST_VERSION ? "${PLUGIN_VERSION}-${DIST_VERSION}" : PLUGIN_VERSION
+rootProject.ext.gitRevision = GIT_REVISION
 version = project.fullVersion
+
 
 project.ext.pluginDesc = [
         id         : 'cd.go.artifact.docker.registry',
@@ -40,6 +70,27 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    test {
+        java {
+            compileClasspath += configurations.compileOnly
+            runtimeClasspath += configurations.compileOnly
+        }
+    }
+
+    integrationTest {
+        java.srcDirs = ['src/integration']
+        resources.srcDirs += ['src/testdata']
+        compileClasspath += main.output + configurations.compileOnly
+        runtimeClasspath += main.output + configurations.compileOnly
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
 dependencies {
     compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
@@ -52,6 +103,41 @@ dependencies {
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
     testCompile group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
 }
+
+tasks.withType(Test) { testTask ->
+
+    testLogging {
+        showStandardStreams = true
+
+        exceptionFormat 'full'
+
+        beforeSuite { suite ->
+            if (suite.parent) {
+                logger.quiet("Running ${suite.name}")
+            }
+        }
+
+        afterSuite { suite, result ->
+            if (suite.parent) {
+                logger.quiet("Tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
+                if (result.resultType == TestResult.ResultType.FAILURE) {
+                    logger.quiet("Test ${suite.name} FAILED")
+                }
+            } else {
+                logger.quiet("Total tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
+            }
+        }
+    }
+}
+
+task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    mustRunAfter tasks.test
+}
+
+check.dependsOn integrationTest
 
 processResources {
     from("src/main/resource-templates") {
@@ -70,9 +156,9 @@ jar {
         into "lib/"
     }
 
-    from(sourceSets.main.java) {
-        into "/"
-    }
+//    from(sourceSets.main.java) {
+//        into "/"
+//    }
 }
 
 tasks.withType(Jar) { jarTask ->
@@ -96,4 +182,20 @@ tasks.withType(Jar) { jarTask ->
                 'Target-Compatibility': project.targetCompatibility
         )
     }
+}
+
+github {
+    owner = System.getenv('GITHUB_USER') ?: 'bob'
+    repo = 'docker-registry-artifact-plugin'
+    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+    tagName = PLUGIN_VERSION
+    name = PLUGIN_VERSION
+    targetCommitish = project.gitRevision
+    body = """
+      # Version ${fullVersion}
+
+      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
+    """.stripIndent().trim()
+
+    assets = jar.outputs.files.files
 }
