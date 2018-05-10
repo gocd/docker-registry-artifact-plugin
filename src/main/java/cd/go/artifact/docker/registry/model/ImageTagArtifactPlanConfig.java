@@ -19,11 +19,6 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
     @FieldMetadata(key = "Tag")
     private String tag;
 
-    @SuppressWarnings("unused")
-    public ImageTagArtifactPlanConfig() {
-        //GSON
-    }
-
     public ImageTagArtifactPlanConfig(String image, String tag) {
         this.image = image;
         this.tag = tag;
@@ -33,6 +28,14 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
     public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {
         String evaluatedTag = evaluate(tag, environmentVariables);
         return new DockerImage(image, evaluatedTag);
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getTag() {
+        return tag;
     }
 
     private String evaluate(String tag, Map<String, String> environmentVariables) {

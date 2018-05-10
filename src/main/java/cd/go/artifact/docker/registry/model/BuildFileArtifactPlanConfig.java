@@ -16,11 +16,6 @@ public class BuildFileArtifactPlanConfig extends ArtifactPlanConfig {
     @FieldMetadata(key = "BuildFile")
     private String buildFile;
 
-    @SuppressWarnings("unused")
-    public BuildFileArtifactPlanConfig(){
-        //GSON
-    }
-
     public BuildFileArtifactPlanConfig(String buildFile) {
         this.buildFile = buildFile;
     }

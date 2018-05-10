@@ -69,10 +69,6 @@ public class ValidatePublishArtifactConfigExecutorTest {
                 "  {" +
                 "    'key': 'Image'," +
                 "    'message': 'Image must not be blank.'" +
-                "  }," +
-                "  {" +
-                "    'key': 'Tag'," +
-                "    'message': 'Tag must not be blank.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
