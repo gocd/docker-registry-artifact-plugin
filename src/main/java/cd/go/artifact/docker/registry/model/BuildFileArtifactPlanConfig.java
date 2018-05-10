@@ -1,17 +1,12 @@
 package cd.go.artifact.docker.registry.model;
 
 import cd.go.artifact.docker.registry.annotation.FieldMetadata;
-import cd.go.artifact.docker.registry.annotation.ValidationError;
-import cd.go.artifact.docker.registry.annotation.ValidationResult;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -44,15 +39,6 @@ public class BuildFileArtifactPlanConfig extends ArtifactPlanConfig {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    @Override
-    public ValidationResult validate() {
-        List<ValidationError> validationErrors = new ArrayList<>();
-        if (StringUtils.isBlank(buildFile)) {
-            validationErrors.add(new ValidationError("BuildFile", "BuildFile must not be blank."));
-        }
-        return new ValidationResult(validationErrors);
     }
 
     @Override

@@ -32,6 +32,7 @@ import java.util.Properties;
 
 public class Util {
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+            .serializeNulls()
             .registerTypeAdapter(ArtifactPlanConfig.class, new ArtifactPlanConfigTypeAdapter())
             .registerTypeAdapter(FieldMetadata.class, new FieldMetadataTypeAdapter())
             .create();

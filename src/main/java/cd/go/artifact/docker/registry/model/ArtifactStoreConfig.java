@@ -17,9 +17,7 @@
 package cd.go.artifact.docker.registry.model;
 
 import cd.go.artifact.docker.registry.annotation.FieldMetadata;
-import cd.go.artifact.docker.registry.annotation.MetadataValidator;
 import cd.go.artifact.docker.registry.annotation.Validatable;
-import cd.go.artifact.docker.registry.annotation.ValidationResult;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -60,11 +58,6 @@ public class ArtifactStoreConfig implements Validatable {
 
     public String getPassword() {
         return password;
-    }
-
-    @Override
-    public ValidationResult validate() {
-        return new MetadataValidator().validate(this);
     }
 
     @Override

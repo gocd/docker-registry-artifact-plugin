@@ -1,13 +1,11 @@
 package cd.go.artifact.docker.registry.model;
 
 import cd.go.artifact.docker.registry.annotation.FieldMetadata;
-import cd.go.artifact.docker.registry.annotation.ValidationError;
-import cd.go.artifact.docker.registry.annotation.ValidationResult;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 
 public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
 
@@ -35,18 +33,6 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
     public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {
         String evaluatedTag = evaluate(tag, environmentVariables);
         return new DockerImage(image, evaluatedTag);
-    }
-
-    @Override
-    public ValidationResult validate() {
-        List<ValidationError> errors = new ArrayList<>();
-        if (StringUtils.isBlank(image)) {
-            errors.add(new ValidationError("Image", "Image must not be blank."));
-        }
-        if (StringUtils.isBlank(tag)) {
-            errors.add(new ValidationError("Tag", "Tag must not be blank."));
-        }
-        return new ValidationResult(errors);
     }
 
     private String evaluate(String tag, Map<String, String> environmentVariables) {

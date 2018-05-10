@@ -16,7 +16,6 @@
 
 package cd.go.artifact.docker.registry.annotation;
 
-import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -34,24 +33,6 @@ public class ConfigMetadata {
         this.key = key;
         this.metadata = metadata;
     }
-
-    public ValidationError validate(String input) {
-        String validationError = doValidate(input);
-        if (Util.isNotBlank(validationError)) {
-            return new ValidationError(key, validationError);
-        }
-        return null;
-    }
-
-    protected String doValidate(String input) {
-        if (isRequired()) {
-            if (Util.isBlank(input)) {
-                return this.key + " must not be blank.";
-            }
-        }
-        return null;
-    }
-
 
     public String getKey() {
         return key;
