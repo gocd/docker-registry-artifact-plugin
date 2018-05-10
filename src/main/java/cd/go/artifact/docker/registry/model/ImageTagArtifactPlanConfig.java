@@ -25,7 +25,7 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
     }
 
     @Override
-    public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {
+    public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) throws UnresolvedTagException {
         String evaluatedTag = evaluate(tag, environmentVariables);
         return new DockerImage(image, evaluatedTag);
     }
@@ -38,12 +38,8 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
         return tag;
     }
 
-    private String evaluate(String tag, Map<String, String> environmentVariables) {
-        try {
-            return new TagPattern(tag).resolve(environmentVariables);
-        } catch (UnresolvedTagException e) {
-            return e.getPartiallyResolvedTag(); //TODO bubble up the exception and send a failure response
-        }
+    private String evaluate(String tag, Map<String, String> environmentVariables) throws UnresolvedTagException {
+        return new TagPattern(tag).resolve(environmentVariables);
     }
 
     @Override
