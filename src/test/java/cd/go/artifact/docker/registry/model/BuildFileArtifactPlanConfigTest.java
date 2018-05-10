@@ -27,17 +27,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ArtifactPlanConfigTest {
+public class BuildFileArtifactPlanConfigTest {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     private File agentWorkingDir;
+    private final Map<String, String> environmentVariables = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
@@ -50,8 +53,8 @@ public class ArtifactPlanConfigTest {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "{\"image\":\"alpine\",\"tag\":\"3.6\"}".getBytes());
 
-        final ArtifactPlanConfig artifactPlanConfig = new ArtifactPlanConfig("build-file.json");
-        final DockerImage dockerImage = artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath());
+        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
+        final DockerImage dockerImage = artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
 
         assertThat(dockerImage.getImage()).isEqualTo("alpine");
         assertThat(dockerImage.getTag()).isEqualTo("3.6");
@@ -61,33 +64,33 @@ public class ArtifactPlanConfigTest {
     public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "bar".getBytes());
-        final ArtifactPlanConfig artifactPlanConfig = new ArtifactPlanConfig("build-file.json");
+        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
 
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath());
+        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
     }
 
     @Test
     public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "[{}]".getBytes());
-        final ArtifactPlanConfig artifactPlanConfig = new ArtifactPlanConfig("build-file.json");
+        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
 
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath());
+        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
     }
 
     @Test
     public void shouldErrorOutWhenFileDoesNotExist() {
-        final ArtifactPlanConfig artifactPlanConfig = new ArtifactPlanConfig("random.json");
+        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("random.json");
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
 
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath());
+        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
     }
 }

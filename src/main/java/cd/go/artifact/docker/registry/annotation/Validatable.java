@@ -30,4 +30,6 @@ public interface Validatable {
         return Util.GSON.fromJson(toJSON(), new TypeToken<Map<String, String>>() {
         }.getType());
     }
+
+    ValidationResult validate();
 }

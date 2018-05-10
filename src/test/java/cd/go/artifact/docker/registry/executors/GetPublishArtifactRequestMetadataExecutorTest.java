@@ -28,7 +28,11 @@ public class GetPublishArtifactRequestMetadataExecutorTest {
     public void shouldReturnFetchArtifactMetadata() throws JSONException {
         final GoPluginApiResponse response = new GetPublishArtifactConfigMetadataExecutor().execute();
 
-        final String expectedJSON = "[{\"key\":\"BuildFile\",\"metadata\":{\"required\":true,\"secure\":false}}]";
+        final String expectedJSON = "[" +
+                "{\"key\":\"BuildFile\",\"metadata\":{\"required\":false,\"secure\":false}}," +
+                "{\"key\":\"Image\",\"metadata\":{\"required\":false,\"secure\":false}}," +
+                "{\"key\":\"Tag\",\"metadata\":{\"required\":false,\"secure\":false}}" +
+                "]";
 
         assertThat(response.responseCode()).isEqualTo(200);
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);

@@ -19,6 +19,7 @@ package cd.go.artifact.docker.registry.executors;
 import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
 import cd.go.artifact.docker.registry.annotation.MetadataHelper;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
+import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -27,10 +28,9 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.List;
 
 public class GetArtifactStoreConfigMetadataExecutor implements RequestExecutor {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public GoPluginApiResponse execute() {
         final List<ConfigMetadata> storeConfigMetadata = MetadataHelper.getMetadata(ArtifactStoreConfig.class);
-        return DefaultGoPluginApiResponse.success( GSON.toJson(storeConfigMetadata));
+        return DefaultGoPluginApiResponse.success( Util.GSON.toJson(storeConfigMetadata));
     }
 }

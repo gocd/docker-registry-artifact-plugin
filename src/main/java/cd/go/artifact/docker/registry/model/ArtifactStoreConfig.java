@@ -16,8 +16,10 @@
 
 package cd.go.artifact.docker.registry.model;
 
-import cd.go.artifact.docker.registry.annotation.ProfileField;
+import cd.go.artifact.docker.registry.annotation.FieldMetadata;
+import cd.go.artifact.docker.registry.annotation.MetadataValidator;
 import cd.go.artifact.docker.registry.annotation.Validatable;
+import cd.go.artifact.docker.registry.annotation.ValidationResult;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -25,17 +27,17 @@ import com.google.gson.annotations.SerializedName;
 public class ArtifactStoreConfig implements Validatable {
     @Expose
     @SerializedName("RegistryURL")
-    @ProfileField(key = "RegistryURL", required = true, secure = false)
+    @FieldMetadata(key = "RegistryURL", required = true)
     private String registryUrl;
 
     @Expose
     @SerializedName("Username")
-    @ProfileField(key = "Username", required = true, secure = false)
+    @FieldMetadata(key = "Username", required = true)
     private String username;
 
     @Expose
     @SerializedName("Password")
-    @ProfileField(key = "Password", required = true, secure = true)
+    @FieldMetadata(key = "Password", required = true, secure = true)
     private String password;
 
 
@@ -58,6 +60,11 @@ public class ArtifactStoreConfig implements Validatable {
 
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public ValidationResult validate() {
+        return new MetadataValidator().validate(this);
     }
 
     @Override

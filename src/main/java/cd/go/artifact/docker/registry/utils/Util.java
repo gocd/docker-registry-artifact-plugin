@@ -16,6 +16,10 @@
 
 package cd.go.artifact.docker.registry.utils;
 
+import cd.go.artifact.docker.registry.annotation.FieldMetadata;
+import cd.go.artifact.docker.registry.annotation.FieldMetadataTypeAdapter;
+import cd.go.artifact.docker.registry.model.ArtifactPlanConfig;
+import cd.go.artifact.docker.registry.model.ArtifactPlanConfigTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -27,7 +31,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class Util {
-    public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+            .registerTypeAdapter(ArtifactPlanConfig.class, new ArtifactPlanConfigTypeAdapter())
+            .registerTypeAdapter(FieldMetadata.class, new FieldMetadataTypeAdapter())
+            .create();
 
     public static String readResource(String resourceFile) {
         return new String(readResourceBytes(resourceFile), StandardCharsets.UTF_8);

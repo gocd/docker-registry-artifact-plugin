@@ -38,7 +38,13 @@ public class ArtifactPlan {
     public ArtifactPlan(String id, String storeId, String buildFile) {
         this.id = id;
         this.storeId = storeId;
-        this.artifactPlanConfig = new ArtifactPlanConfig(buildFile);
+        this.artifactPlanConfig = new BuildFileArtifactPlanConfig(buildFile);
+    }
+
+    public ArtifactPlan(String id, String storeId, String image, String tag) {
+        this.id = id;
+        this.storeId = storeId;
+        this.artifactPlanConfig = new ImageTagArtifactPlanConfig(image, tag);
     }
 
     public String getId() {
@@ -55,7 +61,7 @@ public class ArtifactPlan {
 
     @Override
     public String toString() {
-        return String.format("Artifact[id=%s, storeId=%s, buildFile=%s]", getId(), getStoreId(), artifactPlanConfig.getBuildFile());
+        return String.format("Artifact[id=%s, storeId=%s, artifactPlanConfig=%s]", getId(), getStoreId(), artifactPlanConfig.toString());
     }
 
     @Override

@@ -77,7 +77,7 @@ public class PublishArtifactExecutorTest {
     }
 
     @Test
-    public void shouldPublishArtifact() throws IOException, DockerException, InterruptedException {
+    public void shouldPublishArtifactUsingBuildFile() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
@@ -97,6 +97,23 @@ public class PublishArtifactExecutorTest {
     }
 
     @Test
+    public void shouldPublishArtifactUsingImageAndTag() throws IOException, DockerException, InterruptedException {
+        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "alpine", "3.6");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+
+        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
+
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+
+        verify(dockerClient).push(eq("alpine:3.6"), any(ProgressHandler.class));
+        assertThat(response.responseCode()).isEqualTo(200);
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"alpine:3.6\",\"digest\":\"foo\"}}");
+    }
+
+    @Test
     public void shouldAddErrorToPublishArtifactResponseWhenFailedToPublishImage() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
@@ -113,6 +130,6 @@ public class PublishArtifactExecutorTest {
         final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(500);
-        assertThat(response.responseBody()).contains("Failed to publish Artifact[id=id, storeId=storeId, buildFile=build.json]: Some error");
+        assertThat(response.responseBody()).contains("Failed to publish Artifact[id=id, storeId=storeId, artifactPlanConfig={\"BuildFile\":\"build.json\"}]: Some error");
     }
 }

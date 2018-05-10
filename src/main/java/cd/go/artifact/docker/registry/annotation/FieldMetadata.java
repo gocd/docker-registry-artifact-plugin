@@ -16,39 +16,20 @@
 
 package cd.go.artifact.docker.registry.annotation;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class FieldMetadata implements Metadata {
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FieldMetadata {
 
-    @Expose
-    @SerializedName("required")
-    private boolean required;
+    String key();
 
-    @Expose
-    @SerializedName("secure")
-    private boolean secure;
+    boolean required() default false;
 
-    private FieldType type;
+    boolean secure() default false;
 
-    public FieldMetadata(boolean required, boolean secure, FieldType type) {
-        this.required = required;
-        this.secure = secure;
-        this.type = type;
-    }
-
-    @Override
-    public boolean isRequired() {
-        return required;
-    }
-
-    @Override
-    public boolean isSecure() {
-        return secure;
-    }
-
-    @Override
-    public FieldType getType() {
-        return type;
-    }
+    FieldType type() default FieldType.STRING;
 }

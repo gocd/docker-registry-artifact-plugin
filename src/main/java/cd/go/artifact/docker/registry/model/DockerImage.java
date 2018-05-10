@@ -36,6 +36,11 @@ public class DockerImage {
     public DockerImage() {
     }
 
+    public DockerImage(String image, String tag) {
+        this.image = image;
+        this.tag = tag;
+    }
+
     public String getImage() {
         return image;
     }

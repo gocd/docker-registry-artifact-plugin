@@ -16,8 +16,11 @@
 
 package cd.go.artifact.docker.registry.executors;
 
+import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -56,6 +59,20 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
                 "    \"message\": \"Username must not be blank.\"\n" +
                 "  }\n" +
                 "]";
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidateProperData() throws JSONException {
+        String requestBody = new JSONObject()
+                .put("RegistryURL", "http://localhost/index")
+                .put("Username", "chuck-norris")
+                .put("Password", "chuck-norris-doesnt-need-passwords")
+                .toString();
+        when(request.requestBody()).thenReturn(requestBody);
+
+        final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
+        String expectedJSON = "[]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
     }
 }

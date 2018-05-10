@@ -58,6 +58,6 @@ public class ConfigMetadata {
     }
 
     public boolean isRequired() {
-        return metadata.isRequired();
+        return metadata.required();
     }
 }

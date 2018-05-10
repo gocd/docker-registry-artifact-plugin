@@ -24,9 +24,7 @@ public class MetadataValidator {
         final ValidationResult validationResult = new ValidationResult();
         Map<String, String> properties = configuration.toProperties();
 
-        List<String> knownFields = new ArrayList<>();
         for (ConfigMetadata field : MetadataHelper.getMetadata(configuration.getClass())) {
-            knownFields.add(field.getKey());
             validationResult.addError(field.validate(properties.get(field.getKey())));
         }
 

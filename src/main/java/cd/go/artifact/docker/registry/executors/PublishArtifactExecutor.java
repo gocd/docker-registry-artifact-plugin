@@ -53,7 +53,8 @@ public class PublishArtifactExecutor implements RequestExecutor {
         final ArtifactStoreConfig artifactStoreConfig = publishArtifactRequest.getArtifactStore().getArtifactStoreConfig();
         try {
             final DockerClient docker = clientFactory.docker(artifactStoreConfig);
-            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir());
+            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir(),
+                    publishArtifactRequest.getEnvironmentVariables());
 
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
             consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
