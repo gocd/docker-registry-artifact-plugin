@@ -16,9 +16,8 @@
 
 package cd.go.artifact.docker.registry.executors;
 
-import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
-import cd.go.artifact.docker.registry.annotation.MetadataValidator;
 import cd.go.artifact.docker.registry.annotation.ValidationResult;
+import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -32,7 +31,7 @@ public class ValidateArtifactStoreConfigExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() {
-        final ValidationResult validationResult = new MetadataValidator().validate(artifactStoreConfig);
+        final ValidationResult validationResult = artifactStoreConfig.validate();
         return DefaultGoPluginApiResponse.success(validationResult.toJSON());
     }
 }

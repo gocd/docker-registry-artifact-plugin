@@ -31,10 +31,9 @@ public class MetadataHelper {
         Field[] fields = clazz.getDeclaredFields();
         List<ConfigMetadata> metadata = new ArrayList<>();
         for (Field field : fields) {
-            ProfileField profileField = field.getAnnotation(ProfileField.class);
+            FieldMetadata profileField = field.getAnnotation(FieldMetadata.class);
             if (profileField != null) {
-                final FieldMetadata fieldMetadata = new FieldMetadata(profileField.required(), profileField.secure(), profileField.type());
-                final ConfigMetadata configMetadata = new ConfigMetadata(profileField.key(), fieldMetadata);
+                final ConfigMetadata configMetadata = new ConfigMetadata(profileField.key(), profileField);
                 metadata.add(configMetadata);
             }
         }

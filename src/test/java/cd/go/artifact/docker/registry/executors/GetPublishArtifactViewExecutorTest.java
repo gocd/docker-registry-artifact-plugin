@@ -18,6 +18,7 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.annotation.Validatable;
 import cd.go.artifact.docker.registry.model.ArtifactPlanConfig;
+import cd.go.artifact.docker.registry.model.BuildFileArtifactPlanConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -39,8 +40,10 @@ public class GetPublishArtifactViewExecutorTest extends ViewTest {
         assertThat(responseHash).containsEntry("template", Util.readResource("/publish-artifact.template.html"));
     }
 
+    @Override
     protected Class<? extends Validatable> getConfigClass() {
-        return ArtifactPlanConfig.class;
+        //TODO needs to be updated
+        return BuildFileArtifactPlanConfig.class;
     }
 
     @Override

@@ -20,6 +20,8 @@ import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Map;
+
 public class PublishArtifactRequest {
     @Expose
     @SerializedName("agent_working_directory")
@@ -32,6 +34,10 @@ public class PublishArtifactRequest {
     @Expose
     @SerializedName("artifact_plan")
     private ArtifactPlan artifactPlan;
+
+    @Expose
+    @SerializedName("environment_variables")
+    private Map<String, String> environmentVariables;
 
     public PublishArtifactRequest() {
     }
@@ -52,6 +58,10 @@ public class PublishArtifactRequest {
 
     public ArtifactPlan getArtifactPlan() {
         return artifactPlan;
+    }
+
+    public Map<String, String> getEnvironmentVariables() {
+        return environmentVariables;
     }
 
     public static PublishArtifactRequest fromJSON(String json) {

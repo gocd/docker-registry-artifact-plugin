@@ -16,23 +16,31 @@
 
 package cd.go.artifact.docker.registry.executors;
 
-import cd.go.artifact.docker.registry.model.ArtifactPlanConfig;
-import cd.go.artifact.docker.registry.annotation.MetadataValidator;
+import cd.go.artifact.docker.registry.annotation.ValidationError;
 import cd.go.artifact.docker.registry.annotation.ValidationResult;
+import cd.go.artifact.docker.registry.model.ArtifactPlanConfig;
+import com.google.gson.JsonParseException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 public class ValidatePublishArtifactConfigExecutor implements RequestExecutor {
-    private final ArtifactPlanConfig artifactPlanConfig;
+    private final String artifactPlanConfigJSON;
 
     public ValidatePublishArtifactConfigExecutor(GoPluginApiRequest request) {
-        artifactPlanConfig = ArtifactPlanConfig.fromJSON(request.requestBody());
+        artifactPlanConfigJSON = request.requestBody();
     }
 
     @Override
     public GoPluginApiResponse execute() {
-        final ValidationResult validationResult = new MetadataValidator().validate(artifactPlanConfig);
-        return DefaultGoPluginApiResponse.success(validationResult.toJSON());
+        try {
+            ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(artifactPlanConfigJSON);
+            ValidationResult validationResult = artifactPlanConfig.validate();
+            return DefaultGoPluginApiResponse.success(validationResult.toJSON());
+        } catch (JsonParseException e) {
+            ValidationResult validationResult = new ValidationResult(
+                    new ValidationError("", "Either `Image` and `Tag`, or `BuildFile` should be specified."));
+            return DefaultGoPluginApiResponse.success(validationResult.toJSON());
+        }
     }
 }

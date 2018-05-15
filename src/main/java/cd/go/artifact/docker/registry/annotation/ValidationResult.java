@@ -30,6 +30,10 @@ public class ValidationResult {
         this.errors.addAll(errors);
     }
 
+    public ValidationResult(ValidationError... errors) {
+        this.errors.addAll(Arrays.asList(errors));
+    }
+
     public void addError(String key, String message) {
         errors.add(new ValidationError(key, message));
     }

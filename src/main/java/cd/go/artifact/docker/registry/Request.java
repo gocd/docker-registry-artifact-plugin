@@ -20,23 +20,23 @@ package cd.go.artifact.docker.registry;
  * Enumerable that represents one of the messages that the server sends to the plugin
  */
 public enum Request {
-    REQUEST_GET_PLUGIN_ICON(String.join(".", "cd.go.artifact", "get-icon")),
-    REQUEST_GET_PLUGIN_CAPABILITIES(String.join(".", "cd.go.artifact", "get-capabilities")),
+    REQUEST_GET_PLUGIN_ICON("cd.go.artifact.get-icon"),
+    REQUEST_GET_PLUGIN_CAPABILITIES("cd.go.artifact.get-capabilities"),
 
-    REQUEST_STORE_CONFIG_METADATA(String.join(".", "cd.go.artifact", "store", "get-metadata")),
-    REQUEST_STORE_CONFIG_VIEW(String.join(".", "cd.go.artifact", "store", "get-view")),
-    REQUEST_STORE_CONFIG_VALIDATE(String.join(".", "cd.go.artifact", "store", "validate")),
+    REQUEST_STORE_CONFIG_METADATA("cd.go.artifact.store.get-metadata"),
+    REQUEST_STORE_CONFIG_VIEW("cd.go.artifact.store.get-view"),
+    REQUEST_STORE_CONFIG_VALIDATE("cd.go.artifact.store.validate"),
 
-    REQUEST_PUBLISH_ARTIFACT_METADATA(String.join(".", "cd.go.artifact", "publish", "get-metadata")),
-    REQUEST_PUBLISH_ARTIFACT_VIEW(String.join(".", "cd.go.artifact", "publish", "get-view")),
-    REQUEST_PUBLISH_ARTIFACT_VALIDATE(String.join(".", "cd.go.artifact", "publish", "validate")),
+    REQUEST_PUBLISH_ARTIFACT_METADATA("cd.go.artifact.publish.get-metadata"),
+    REQUEST_PUBLISH_ARTIFACT_VIEW("cd.go.artifact.publish.get-view"),
+    REQUEST_PUBLISH_ARTIFACT_VALIDATE("cd.go.artifact.publish.validate"),
 
-    REQUEST_FETCH_ARTIFACT_METADATA(String.join(".", "cd.go.artifact", "fetch", "get-metadata")),
-    REQUEST_FETCH_ARTIFACT_VIEW(String.join(".", "cd.go.artifact", "fetch", "get-view")),
-    REQUEST_FETCH_ARTIFACT_VALIDATE(String.join(".", "cd.go.artifact", "fetch", "validate")),
+    REQUEST_FETCH_ARTIFACT_METADATA("cd.go.artifact.fetch.get-metadata"),
+    REQUEST_FETCH_ARTIFACT_VIEW("cd.go.artifact.fetch.get-view"),
+    REQUEST_FETCH_ARTIFACT_VALIDATE("cd.go.artifact.fetch.validate"),
 
-    REQUEST_PUBLISH_ARTIFACT(String.join(".", "cd.go.artifact", "publish-artifact")),
-    REQUEST_FETCH_ARTIFACT(String.join(".", "cd.go.artifact", "fetch-artifact"));
+    REQUEST_PUBLISH_ARTIFACT("cd.go.artifact.publish-artifact"),
+    REQUEST_FETCH_ARTIFACT("cd.go.artifact.fetch-artifact");
 
     private final String requestName;
 

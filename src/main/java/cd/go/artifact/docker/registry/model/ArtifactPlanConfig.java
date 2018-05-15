@@ -16,61 +16,18 @@
 
 package cd.go.artifact.docker.registry.model;
 
-import cd.go.artifact.docker.registry.annotation.ProfileField;
 import cd.go.artifact.docker.registry.annotation.Validatable;
 import cd.go.artifact.docker.registry.utils.Util;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Map;
 
-public class ArtifactPlanConfig implements Validatable {
-    @Expose
-    @SerializedName("BuildFile")
-    @ProfileField(key = "BuildFile", required = true, secure = false)
-    private String buildFile;
+public abstract class ArtifactPlanConfig implements Validatable {
 
-    public ArtifactPlanConfig() {
-    }
-
-    public ArtifactPlanConfig(String buildFile) {
-        this.buildFile = buildFile;
-    }
-
-    public String getBuildFile() {
-        return buildFile;
-    }
-
-    public DockerImage imageToPush(String agentWorkingDirectory) {
-        try {
-            return DockerImage.fromFile(new File(agentWorkingDirectory, getBuildFile()));
-        } catch (JsonSyntaxException e) {
-            throw new RuntimeException(String.format("File[%s] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.", buildFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
+    abstract public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) throws UnresolvedTagException;
 
     @Override
     public String toString() {
         return toJSON();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ArtifactPlanConfig)) return false;
-
-        ArtifactPlanConfig that = (ArtifactPlanConfig) o;
-
-        return buildFile != null ? buildFile.equals(that.buildFile) : that.buildFile == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return buildFile != null ? buildFile.hashCode() : 0;
     }
 
     public static ArtifactPlanConfig fromJSON(String json) {
