@@ -83,7 +83,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
         String expectedJSON = "[" +
                 "  {" +
                 "    'key': ''," +
-                "    'message': 'Please specify an Image and Tag, or a BuildFile.'" +
+                "    'message': 'Either `Image` and `Tag`, or `BuildFile` should be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -103,7 +103,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
         String expectedResponse = new JSONArray().put(
                 new JSONObject()
                         .put("key", "")
-                        .put("message", "Please specify an Image and Tag, or a BuildFile.")
+                        .put("message", "Either `Image` and `Tag`, or `BuildFile` should be specified.")
         ).toString();
 
         JSONAssert.assertEquals(expectedResponse, response.responseBody(), true);
