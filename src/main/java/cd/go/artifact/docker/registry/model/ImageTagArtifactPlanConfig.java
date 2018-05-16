@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
 
@@ -19,9 +20,9 @@ public class ImageTagArtifactPlanConfig extends ArtifactPlanConfig {
     @FieldMetadata(key = "Tag")
     private String tag;
 
-    public ImageTagArtifactPlanConfig(String image, String tag) {
+    public ImageTagArtifactPlanConfig(String image, Optional<String> tag) {
         this.image = image;
-        this.tag = tag;
+        this.tag = tag.orElse("latest");
     }
 
     @Override
