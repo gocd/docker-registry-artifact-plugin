@@ -82,15 +82,15 @@ public class FetchArtifactExecutor implements RequestExecutor {
 
     public void validateMetadata(Map<String, String> artifactMap) {
         if (artifactMap == null) {
-            throw new RuntimeException(format("Invalid metadata received from server. It can not be null."));
+            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata is null."));
         }
 
         if (!artifactMap.containsKey("image")) {
-            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "image"));
+            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata must contain the key `%s`.", "image"));
         }
 
         if (!artifactMap.containsKey("digest")) {
-            throw new RuntimeException(format("Invalid metadata received from server. It must contain key `%s`.", "digest"));
+            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata must contain the key `%s`.", "digest"));
         }
     }
 
