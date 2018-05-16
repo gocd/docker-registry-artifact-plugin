@@ -39,7 +39,7 @@ public class ValidatePublishArtifactConfigExecutor implements RequestExecutor {
             return DefaultGoPluginApiResponse.success(validationResult.toJSON());
         } catch (JsonParseException e) {
             ValidationResult validationResult = new ValidationResult(
-                    new ValidationError("", "Either `Image` and `Tag`, or `BuildFile` should be specified."));
+                    new ValidationError("", "Either `Image` or `BuildFile` should be specified."));
             return DefaultGoPluginApiResponse.success(validationResult.toJSON());
         }
     }
