@@ -4,6 +4,7 @@ import com.google.gson.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactPlanConfig>, JsonSerializer<ArtifactPlanConfig> {
 
@@ -19,12 +20,12 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
         }
     }
 
-    private String parseTag(JsonObject jsonObject) {
+    private Optional<String> parseTag(JsonObject jsonObject) {
         JsonElement tag = jsonObject.get("Tag");
         if (tag != null && StringUtils.isNotBlank(tag.getAsString())) {
-            return tag.getAsString();
+            return Optional.of(tag.getAsString());
         }
-        return "latest";
+        return Optional.empty();
     }
 
     @Override
