@@ -82,7 +82,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
-                "    'key': ''," +
+                "    'key': 'configuration'," +
                 "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
                 "  }" +
                 "]";
@@ -102,7 +102,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedResponse = new JSONArray().put(
                 new JSONObject()
-                        .put("key", "")
+                        .put("key", "configuration")
                         .put("message", "Either `Image` or `BuildFile` should be specified.")
         ).toString();
 
