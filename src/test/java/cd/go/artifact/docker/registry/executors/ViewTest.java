@@ -17,8 +17,6 @@
 package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
-import cd.go.artifact.docker.registry.annotation.MetadataHelper;
-import cd.go.artifact.docker.registry.annotation.Validatable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -37,7 +35,7 @@ public abstract class ViewTest {
     @Test
     public void allFieldsShouldBePresentInView() throws Exception {
         final Document document = getDocument();
-        final List<ConfigMetadata> metadataList = MetadataHelper.getMetadata(getConfigClass());
+        final List<ConfigMetadata> metadataList = getMetadataList();
         for (ConfigMetadata field : metadataList) {
             final String name = field.getKey();
             final Elements inputFieldForName = document.getElementsByAttributeValue("ng-model", name);
@@ -67,7 +65,7 @@ public abstract class ViewTest {
         return Jsoup.parse(responseHash.get("template"));
     }
 
-    protected abstract Class<? extends Validatable> getConfigClass();
+    protected abstract List<ConfigMetadata> getMetadataList();
 
     protected abstract RequestExecutor getRequestExecutor();
 }
