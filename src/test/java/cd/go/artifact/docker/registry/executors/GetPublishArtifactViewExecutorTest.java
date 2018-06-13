@@ -16,15 +16,18 @@
 
 package cd.go.artifact.docker.registry.executors;
 
-import cd.go.artifact.docker.registry.annotation.Validatable;
-import cd.go.artifact.docker.registry.model.ArtifactPlanConfig;
+import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
+import cd.go.artifact.docker.registry.annotation.MetadataHelper;
 import cd.go.artifact.docker.registry.model.BuildFileArtifactPlanConfig;
+import cd.go.artifact.docker.registry.model.ImageTagArtifactPlanConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,10 +43,13 @@ public class GetPublishArtifactViewExecutorTest extends ViewTest {
         assertThat(responseHash).containsEntry("template", Util.readResource("/publish-artifact.template.html"));
     }
 
+
     @Override
-    protected Class<? extends Validatable> getConfigClass() {
-        //TODO needs to be updated
-        return BuildFileArtifactPlanConfig.class;
+    protected List<ConfigMetadata> getMetadataList() {
+        List<ConfigMetadata> configMetadata = new ArrayList<>();
+        configMetadata.addAll(MetadataHelper.getMetadata(BuildFileArtifactPlanConfig.class));
+        configMetadata.addAll(MetadataHelper.getMetadata(ImageTagArtifactPlanConfig.class));
+        return configMetadata;
     }
 
     @Override

@@ -16,7 +16,8 @@
 
 package cd.go.artifact.docker.registry.executors;
 
-import cd.go.artifact.docker.registry.annotation.Validatable;
+import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
+import cd.go.artifact.docker.registry.annotation.MetadataHelper;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.Gson;
@@ -24,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +41,9 @@ public class GetArtifactStoreViewExecutorTest extends ViewTest {
         assertThat(responseHash).containsEntry("template", Util.readResource("/artifact-store.template.html"));
     }
 
-    protected Class<? extends Validatable> getConfigClass() {
-        return ArtifactStoreConfig.class;
+    @Override
+    protected List<ConfigMetadata> getMetadataList() {
+        return MetadataHelper.getMetadata(ArtifactStoreConfig.class);
     }
 
     @Override
