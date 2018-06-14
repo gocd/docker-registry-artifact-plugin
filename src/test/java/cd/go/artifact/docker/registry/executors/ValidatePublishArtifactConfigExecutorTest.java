@@ -49,7 +49,11 @@ public class ValidatePublishArtifactConfigExecutorTest {
         String expectedJSON = "[" +
                 "  {" +
                 "    'key': 'BuildFile'," +
-                "    'message': 'BuildFile must not be blank.'" +
+                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "  }," +
+                "  {" +
+                "    'key': 'Image'," +
+                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -67,8 +71,12 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
+                "    'key': 'BuildFile'," +
+                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "  }," +
+                "  {" +
                 "    'key': 'Image'," +
-                "    'message': 'Image must not be blank.'" +
+                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -82,7 +90,11 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
-                "    'key': 'configuration'," +
+                "    'key': 'BuildFile'," +
+                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "  }," +
+                "  {" +
+                "    'key': 'Image'," +
                 "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
                 "  }" +
                 "]";
@@ -102,9 +114,11 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedResponse = new JSONArray().put(
                 new JSONObject()
-                        .put("key", "configuration")
+                        .put("key", "Image")
                         .put("message", "Either `Image` or `BuildFile` should be specified.")
-        ).toString();
+        ).put(new JSONObject()
+                .put("key", "BuildFile")
+                .put("message", "Either `Image` or `BuildFile` should be specified.")).toString();
 
         JSONAssert.assertEquals(expectedResponse, response.responseBody(), true);
     }
