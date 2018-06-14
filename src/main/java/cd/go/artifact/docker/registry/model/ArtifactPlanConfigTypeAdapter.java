@@ -16,7 +16,7 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
         } else if (isBuildFileConfig(jsonObject)) {
             return new BuildFileArtifactPlanConfig(jsonObject.get("BuildFile").getAsString());
         } else {
-            throw new JsonParseException("Ambiguous or unknown json");
+            throw new JsonParseException("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
         }
     }
 
@@ -39,10 +39,22 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
     }
 
     private boolean isBuildFileConfig(JsonObject jsonObject) {
-        return jsonObject.has("BuildFile") && !jsonObject.has("Image") && !jsonObject.has("Tag");
+        return containsBuildFileProperty(jsonObject) && !containsImageProperty(jsonObject);
     }
 
     private boolean isImageTagConfig(JsonObject jsonObject) {
-        return jsonObject.has("Image") && !jsonObject.has("BuildFile");
+        return containsImageProperty(jsonObject) && !containsBuildFileProperty(jsonObject);
+    }
+
+    private boolean containsBuildFileProperty(JsonObject jsonObject) {
+        return jsonObject.has("BuildFile") && isPropertyNotBlank(jsonObject, "BuildFile");
+    }
+
+    private boolean containsImageProperty(JsonObject jsonObject) {
+        return jsonObject.has("Image") && isPropertyNotBlank(jsonObject, "Image");
+    }
+
+    private boolean isPropertyNotBlank(JsonObject jsonObject, String property) {
+        return StringUtils.isNotBlank(jsonObject.get(property).getAsString());
     }
 }
