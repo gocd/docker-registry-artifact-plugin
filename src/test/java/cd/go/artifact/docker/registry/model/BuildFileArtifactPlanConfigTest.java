@@ -49,7 +49,7 @@ public class BuildFileArtifactPlanConfigTest {
     }
 
     @Test
-    public void shouldReadImageAndTagBuildFile() throws IOException, UnresolvedTagException {
+    public void shouldReadImageAndTagBuildFile() throws IOException, UnresolvedPropertyException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "{\"image\":\"alpine\",\"tag\":\"3.6\"}".getBytes());
 
@@ -61,7 +61,7 @@ public class BuildFileArtifactPlanConfigTest {
     }
 
     @Test
-    public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException, UnresolvedTagException {
+    public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException, UnresolvedPropertyException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "bar".getBytes());
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
@@ -73,7 +73,7 @@ public class BuildFileArtifactPlanConfigTest {
     }
 
     @Test
-    public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException, UnresolvedTagException {
+    public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException, UnresolvedPropertyException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "[{}]".getBytes());
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
@@ -85,7 +85,7 @@ public class BuildFileArtifactPlanConfigTest {
     }
 
     @Test
-    public void shouldErrorOutWhenFileDoesNotExist() throws UnresolvedTagException {
+    public void shouldErrorOutWhenFileDoesNotExist() throws UnresolvedPropertyException {
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("random.json");
 
         thrown.expect(RuntimeException.class);
