@@ -55,6 +55,11 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
     }
 
     private boolean isPropertyNotBlank(JsonObject jsonObject, String property) {
-        return StringUtils.isNotBlank(jsonObject.get(property).getAsString());
+        try {
+            JsonElement jsonElement = jsonObject.get(property);
+            return StringUtils.isNotBlank(jsonElement.getAsString());
+        } catch (UnsupportedOperationException e) {
+            return false;
+        }
     }
 }

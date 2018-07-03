@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.fail;
 
 
@@ -60,5 +61,15 @@ public class ArtifactPlanConfigTypeAdapterTest {
                 assertThat(e.getMessage()).isEqualTo("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
             }
         }
+    }
+
+
+    @Test
+    public void shouldParseConfigurationsWithJsonNull() throws JSONException {
+        String json = "{\"BuildFile\": null, \"Image\": \"alpine\"}";
+        ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
+
+        assertThat(artifactPlanConfig).isInstanceOf(ImageTagArtifactPlanConfig.class);
+        assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getImage()).isEqualTo("alpine");
     }
 }
