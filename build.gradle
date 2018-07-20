@@ -15,33 +15,33 @@
  */
 
 plugins {
-    id 'co.riiid.gradle' version '0.4.2'
+  id 'co.riiid.gradle' version '0.4.2'
 }
 
 apply plugin: 'java'
 apply from: 'plugin-common.gradle'
 
 def gitRevision = { ->
-    def hashStdOut = new ByteArrayOutputStream()
-    exec {
-        commandLine "git", "log", "-n", "1", "--format=%H"
-        standardOutput = hashStdOut
-    }
+  def hashStdOut = new ByteArrayOutputStream()
+  exec {
+    commandLine "git", "log", "-n", "1", "--format=%H"
+    standardOutput = hashStdOut
+  }
 
-    return hashStdOut.toString().trim()
+  return hashStdOut.toString().trim()
 }
 
 def releaseRevision = { ->
-    def hashStdOut = new ByteArrayOutputStream()
-    exec {
-        commandLine "git", "log", "--pretty=format:"
-        standardOutput = hashStdOut
-    }
+  def hashStdOut = new ByteArrayOutputStream()
+  exec {
+    commandLine "git", "log", "--pretty=format:"
+    standardOutput = hashStdOut
+  }
 
-    return hashStdOut.size().toString()
+  return hashStdOut.size().toString()
 }
 
-def PLUGIN_VERSION = '0.0.1'
+def PLUGIN_VERSION = '1.0.0'
 def DIST_VERSION = releaseRevision()
 def GIT_REVISION = gitRevision()
 
@@ -54,107 +54,66 @@ version = project.fullVersion
 
 
 project.ext.pluginDesc = [
-        id         : 'cd.go.artifact.docker.registry',
-        version    : project.version,
-        goCdVersion: '18.1.0',
-        name       : 'Artifact plugin for docker',
-        description: 'Plugin allows to push/pull docker image from public or private docker registry',
-        vendorName : 'GoCD Contributors',
-        vendorUrl  : 'https://github.com/gocd/docker-artifact-plugin'
+  id         : 'cd.go.artifact.docker.registry',
+  version    : project.version,
+  goCdVersion: '18.7.0',
+  name       : 'Artifact plugin for docker',
+  description: 'Plugin allows to push/pull docker image from public or private docker registry',
+  vendorName : 'GoCD Contributors',
+  vendorUrl  : 'https://github.com/gocd/docker-artifact-plugin'
 ]
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 sourceSets {
-    test {
-        java {
-            compileClasspath += configurations.compileOnly
-            runtimeClasspath += configurations.compileOnly
-        }
+  test {
+    java {
+      compileClasspath += configurations.compileOnly
+      runtimeClasspath += configurations.compileOnly
     }
+  }
 
-    integrationTest {
-        java.srcDirs = ['src/integration']
-        resources.srcDirs += ['src/testdata']
-        compileClasspath += main.output + configurations.compileOnly
-        runtimeClasspath += main.output + configurations.compileOnly
-    }
-}
-
-configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
+  integrationTest {
+    resources.srcDirs += ['src/testdata']
+    compileClasspath += main.output + configurations.compileOnly
+    runtimeClasspath += main.output + configurations.compileOnly
+  }
 }
 
 dependencies {
-    compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
-    compile group: 'com.spotify', name: 'docker-client', version: '8.10.1'
+  compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: '18.6.0'
+  compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
+  compile group: 'com.spotify', name: 'docker-client', version: '8.10.1'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.13.0'
-    testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.3.0'
-    testCompile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
-    testCompile group: 'cd.go.plugin', name: 'go-plugin-api', version: project.pluginDesc.goCdVersion
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+  testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '2.13.0'
+  testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.3.0'
+  testCompile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
+  testCompile group: 'cd.go.plugin', name: 'go-plugin-api', version: '18.6.0'
 }
-
-tasks.withType(Test) { testTask ->
-
-    testLogging {
-        showStandardStreams = true
-
-        exceptionFormat 'full'
-
-        beforeSuite { suite ->
-            if (suite.parent) {
-                logger.quiet("Running ${suite.name}")
-            }
-        }
-
-        afterSuite { suite, result ->
-            if (suite.parent) {
-                logger.quiet("Tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-                if (result.resultType == TestResult.ResultType.FAILURE) {
-                    logger.quiet("Test ${suite.name} FAILED")
-                }
-            } else {
-                logger.quiet("Total tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-            }
-        }
-    }
-}
-
-task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-
-    mustRunAfter tasks.test
-}
-
-check.dependsOn integrationTest
 
 processResources {
-    from("src/main/resource-templates") {
-        filesMatching('plugin.xml') {
-            expand project.pluginDesc
-        }
-
-        filesMatching('plugin.properties') {
-            expand project.pluginDesc
-        }
+  from("src/main/resource-templates") {
+    filesMatching('plugin.xml') {
+      expand project.pluginDesc
     }
+
+    filesMatching('plugin.properties') {
+      expand project.pluginDesc
+    }
+  }
 }
 
 jar {
-    from(configurations.compile) {
-        into "lib/"
-    }
+  from(configurations.compile) {
+    into "lib/"
+  }
 
 //    from(sourceSets.main.java) {
 //        into "/"
@@ -162,40 +121,42 @@ jar {
 }
 
 tasks.withType(Jar) { jarTask ->
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
+  preserveFileTimestamps = false
+  reproducibleFileOrder = true
 
-    ['MD5', 'SHA1', 'SHA-256'].each { algo ->
-        jarTask.outputs.files("${jarTask.archivePath}.${algo}")
-        jarTask.doLast {
-            ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
-        }
+  ['MD5', 'SHA1', 'SHA-256'].each { algo ->
+    jarTask.outputs.files("${jarTask.archivePath}.${algo}")
+    jarTask.doLast {
+      ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
     }
+  }
 
-    manifest {
-        attributes(
-                'Go-Version': project.pluginDesc.goCdVersion,
-                'Plugin-Revision': project.pluginDesc.version,
-                'Implementation-Title': project.name,
-                'Implementation-Version': project.version,
-                'Source-Compatibility': project.sourceCompatibility,
-                'Target-Compatibility': project.targetCompatibility
-        )
-    }
+  manifest {
+    attributes(
+      'Go-Version': project.pluginDesc.goCdVersion,
+      'Plugin-Revision': project.pluginDesc.version,
+      'Implementation-Title': project.name,
+      'Implementation-Version': project.version,
+      'Source-Compatibility': project.sourceCompatibility,
+      'Target-Compatibility': project.targetCompatibility
+    )
+  }
 }
 
 github {
-    owner = System.getenv('GITHUB_USER') ?: 'bob'
-    repo = 'docker-registry-artifact-plugin'
-    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-    tagName = PLUGIN_VERSION
-    name = PLUGIN_VERSION
-    targetCommitish = project.gitRevision
-    body = """
+  owner = System.getenv('GITHUB_USER') ?: 'bob'
+  repo = 'docker-registry-artifact-plugin'
+  token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+  tagName = PLUGIN_VERSION
+  name = PLUGIN_VERSION
+  targetCommitish = project.gitRevision
+  body = """
       # Version ${fullVersion}
 
-      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
+      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${
+    github.tagName.replaceAll(/[^A-Za-z0-9]/, '')
+  }
     """.stripIndent().trim()
 
-    assets = jar.outputs.files.files
+  assets = jar.outputs.files.files
 }
