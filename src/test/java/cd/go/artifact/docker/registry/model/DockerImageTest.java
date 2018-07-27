@@ -86,10 +86,10 @@ public class DockerImageTest {
     public void shouldErrorOutWhenFileDoesNotExist() throws IOException {
         thrown.expect(FileNotFoundException.class);
         if (SystemUtils.IS_OS_WINDOWS) {
-            thrown.expectMessage(String.format("%s\\random.json (The system cannot find the file specified)", agentWorkingDir.getAbsolutePath()));
+            thrown.expectMessage(String.format("%s%srandom.json (The system cannot find the file specified)", agentWorkingDir.getAbsolutePath(), File.separator));
         }
         else {
-            thrown.expectMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
+            thrown.expectMessage(String.format("%s&srandom.json (No such file or directory)", agentWorkingDir.getAbsolutePath(), File.separator));
         }
 
         DockerImage.fromFile(new File(agentWorkingDir,"random.json"));
