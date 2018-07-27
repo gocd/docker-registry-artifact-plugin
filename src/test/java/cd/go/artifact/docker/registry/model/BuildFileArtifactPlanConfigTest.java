@@ -16,6 +16,7 @@
 
 package cd.go.artifact.docker.registry.model;
 
+import org.apache.commons.lang.SystemUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -89,7 +90,13 @@ public class BuildFileArtifactPlanConfigTest {
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("random.json");
 
         thrown.expect(RuntimeException.class);
-        thrown.expectMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            thrown.expectMessage(String.format("%s\\random.json (The system cannot find the file specified)", agentWorkingDir.getAbsolutePath()));
+        }
+        else {
+            thrown.expectMessage(String.format("%%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
+        }
+
 
         artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
     }
