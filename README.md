@@ -1,3 +1,5 @@
+This is a fork to create an artifact plugin to store artifacts in S3. This documentation will be updated as the code gets changed.
+
 # Docker Registry Artifact plugin
 
 The docker registry artifact plugin provides a way to push and pull docker images on GoCD 
