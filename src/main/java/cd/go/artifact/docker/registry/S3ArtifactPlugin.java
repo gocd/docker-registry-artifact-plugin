@@ -34,8 +34,8 @@ import java.util.Properties;
 import static cd.go.artifact.docker.registry.Constants.PLUGIN_IDENTIFIER;
 
 @Extension
-public class DockerRegistryArtifactPlugin implements GoPlugin {
-    public static final Logger LOG = Logger.getLoggerFor(DockerRegistryArtifactPlugin.class);
+public class S3ArtifactPlugin implements GoPlugin {
+    public static final Logger LOG = Logger.getLoggerFor(S3ArtifactPlugin.class);
     private ConsoleLogger consoleLogger;
 
     @Load

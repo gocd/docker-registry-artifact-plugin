@@ -30,18 +30,4 @@ public class ArtifactPlanConfigTypeAdapterTest {
         }
     }
 
-    @Test
-    public void shouldThrowAnExceptionWhenBothBuildFileAndImageAreProvided() throws JSONException {
-        List<String> inputs = Collections.singletonList(
-                new JSONObject().put("BuildFile", "info.json").put("Tag", "").put("Image", "fml").toString());
-
-        for (String json : inputs) {
-            try {
-                ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
-                fail("Should not reach here");
-            } catch (JsonParseException e) {
-                assertThat(e.getMessage()).isEqualTo("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
-            }
-        }
-    }
 }

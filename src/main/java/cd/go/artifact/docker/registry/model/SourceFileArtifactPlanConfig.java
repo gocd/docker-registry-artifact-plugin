@@ -20,10 +20,10 @@ public class SourceFileArtifactPlanConfig extends ArtifactPlanConfig {
         this.source = source;
     }
 
+    @Override
     public String getSource() {
         return source;
     }
-
 
     @Override
     public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {

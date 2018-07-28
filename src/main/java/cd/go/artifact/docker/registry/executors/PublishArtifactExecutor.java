@@ -18,31 +18,36 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
 import cd.go.artifact.docker.registry.DockerClientFactory;
-import cd.go.artifact.docker.registry.DockerProgressHandler;
+import cd.go.artifact.docker.registry.S3ClientFactory;
 import cd.go.artifact.docker.registry.model.*;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.spotify.docker.client.DockerClient;
+import com.sun.org.apache.bcel.internal.classfile.SourceFile;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import static cd.go.artifact.docker.registry.DockerRegistryArtifactPlugin.LOG;
+import java.io.File;
+import java.nio.file.Paths;
+
+import static cd.go.artifact.docker.registry.S3ArtifactPlugin.LOG;
 import static java.lang.String.format;
 
 public class PublishArtifactExecutor implements RequestExecutor {
     private final PublishArtifactRequest publishArtifactRequest;
     private final PublishArtifactResponse publishArtifactResponse;
     private final ConsoleLogger consoleLogger;
-    private final DockerProgressHandler progressHandler;
-    private final DockerClientFactory clientFactory;
+    private final S3ClientFactory clientFactory;
 
     public PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
-        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
+        this(request, consoleLogger, S3ClientFactory.instance());
     }
 
-    PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler progressHandler, DockerClientFactory clientFactory) {
+    PublishArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, S3ClientFactory clientFactory) {
         this.publishArtifactRequest = PublishArtifactRequest.fromJSON(request.requestBody());
         this.consoleLogger = consoleLogger;
-        this.progressHandler = progressHandler;
         this.clientFactory = clientFactory;
         publishArtifactResponse = new PublishArtifactResponse();
     }
@@ -52,18 +57,18 @@ public class PublishArtifactExecutor implements RequestExecutor {
         ArtifactPlan artifactPlan = publishArtifactRequest.getArtifactPlan();
         final ArtifactStoreConfig artifactStoreConfig = publishArtifactRequest.getArtifactStore().getArtifactStoreConfig();
         try {
-            final DockerClient docker = clientFactory.docker(artifactStoreConfig);
-            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir(),
-                    publishArtifactRequest.getEnvironmentVariables());
+            final AmazonS3 s3 = clientFactory.s3(artifactStoreConfig);
+            final String sourceFile = artifactPlan.getArtifactPlanConfig().getSource();
+            final String s3bucket = artifactStoreConfig.getS3bucket();
+            final String workingDir = publishArtifactRequest.getAgentWorkingDir();
 
-            LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
-            consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
-
-            docker.push(image.toString(), progressHandler);
-            docker.close();
+            PutObjectRequest request = new PutObjectRequest(s3bucket, sourceFile, new File(Paths.get(workingDir, sourceFile).toString()));
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("plain/text");
+            request.setMetadata(metadata);
+            s3.putObject(request);
 
             publishArtifactResponse.addMetadata("image", image.toString());
-            publishArtifactResponse.addMetadata("digest", progressHandler.getDigest());
             consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
             return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
         } catch (Exception e) {

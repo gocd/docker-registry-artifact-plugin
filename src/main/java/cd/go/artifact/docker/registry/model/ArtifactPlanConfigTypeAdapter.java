@@ -14,7 +14,7 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
         if (isBuildFileConfig(jsonObject)) {
             return new SourceFileArtifactPlanConfig(jsonObject.get("Source").getAsString());
         } else {
-            throw new JsonParseException("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
+            throw new JsonParseException("Ambiguous or unknown json. `Source` property must be specified.");
         }
     }
 

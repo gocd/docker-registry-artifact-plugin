@@ -18,7 +18,6 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
 import cd.go.artifact.docker.registry.DockerClientFactory;
-import cd.go.artifact.docker.registry.DockerProgressHandler;
 import cd.go.artifact.docker.registry.model.ArtifactPlan;
 import cd.go.artifact.docker.registry.model.ArtifactStore;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
@@ -34,7 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.io.File;
@@ -42,7 +40,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,8 +57,6 @@ public class PublishArtifactExecutorTest {
     private GoPluginApiRequest request;
     @Mock
     private ConsoleLogger consoleLogger;
-    @Mock
-    private DockerProgressHandler dockerProgressHandler;
     @Mock
     private DefaultDockerClient dockerClient;
     @Mock
@@ -88,32 +83,11 @@ public class PublishArtifactExecutorTest {
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
-        when(dockerProgressHandler.getDigest()).thenReturn("foo");
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
 
-        verify(dockerClient).push(eq("localhost:5000/alpine:3.6"), any(ProgressHandler.class));
+        verify(dockerClient).push(eq("localhost:5000/alpine:3.6"));
         assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\",\"digest\":\"foo\"}}");
-    }
-
-    @Test
-    public void shouldAddErrorToPublishArtifactResponseWhenFailedToPublishImage() throws IOException, DockerException, InterruptedException {
-        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
-        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
-        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), artifactStoreConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
-        final ArgumentCaptor<DockerProgressHandler> argumentCaptor = ArgumentCaptor.forClass(DockerProgressHandler.class);
-
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build.json");
-        Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
-
-        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
-        doThrow(new RuntimeException("Some error")).when(dockerClient).push(eq("localhost:5000/alpine:3.6"), argumentCaptor.capture());
-
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
-
-        assertThat(response.responseCode()).isEqualTo(500);
-        assertThat(response.responseBody()).contains("Failed to publish Artifact[id=id, storeId=storeId, artifactPlanConfig={\"Source\":\"build.json\"}]: Some error");
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\"}}");
     }
 }

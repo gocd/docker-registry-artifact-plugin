@@ -18,7 +18,6 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
 import cd.go.artifact.docker.registry.DockerClientFactory;
-import cd.go.artifact.docker.registry.DockerProgressHandler;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.annotations.Expose;
@@ -30,24 +29,22 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.Map;
 
-import static cd.go.artifact.docker.registry.DockerRegistryArtifactPlugin.LOG;
+import static cd.go.artifact.docker.registry.S3ArtifactPlugin.LOG;
 import static java.lang.String.format;
 
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
     private final ConsoleLogger consoleLogger;
     private DockerClientFactory clientFactory;
-    private final DockerProgressHandler dockerProgressHandler;
 
     public FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
-        this(request, consoleLogger, new DockerProgressHandler(consoleLogger), DockerClientFactory.instance());
+        this(request, consoleLogger, DockerClientFactory.instance());
     }
 
-    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerProgressHandler dockerProgressHandler, DockerClientFactory clientFactory) {
+    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerClientFactory clientFactory) {
         this.fetchArtifactRequest = FetchArtifactRequest.fromJSON(request.requestBody());
         this.consoleLogger = consoleLogger;
         this.clientFactory = clientFactory;
-        this.dockerProgressHandler = dockerProgressHandler;
     }
 
     @Override
@@ -62,14 +59,10 @@ public class FetchArtifactExecutor implements RequestExecutor {
             LOG.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
 
             DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-            docker.pull(imageToPull, dockerProgressHandler);
+            docker.pull(imageToPull);
             docker.close();
 
             consoleLogger.info(String.format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
-
-            if (!dockerProgressHandler.getDigest().equals(artifactMap.get("digest"))) {
-                throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
-            }
 
             return DefaultGoPluginApiResponse.success("");
         } catch (Exception e) {

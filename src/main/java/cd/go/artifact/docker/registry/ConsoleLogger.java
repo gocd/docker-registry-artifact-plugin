@@ -24,7 +24,7 @@ import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 
 import static cd.go.artifact.docker.registry.Constants.API_VERSION;
 import static cd.go.artifact.docker.registry.Constants.PLUGIN_IDENTIFIER;
-import static cd.go.artifact.docker.registry.DockerRegistryArtifactPlugin.LOG;
+import static cd.go.artifact.docker.registry.S3ArtifactPlugin.LOG;
 
 public class ConsoleLogger {
     private static ConsoleLogger consoleLogger;
