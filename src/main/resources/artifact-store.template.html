@@ -1,17 +1,17 @@
 <div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryURL].$error.server}">Docker Registry Url:<span class='asterix'>*</span></label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryURL].$error.server}" type="text" ng-model="RegistryURL" ng-required="true" placeholder="value"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[RegistryURL].$error.server}" ng-show="GOINPUTNAME[RegistryURL].$error.server">{{GOINPUTNAME[RegistryURL].$error.server}}</span>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[S3Bucket].$error.server}">S3 Bucket:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[S3Bucket].$error.server}" type="text" ng-model="S3Bucket" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[S3Bucket].$error.server}" ng-show="GOINPUTNAME[S3Bucket].$error.server">{{GOINPUTNAME[S3Bucket].$error.server}}</span>
 </div>
 
 <div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Username].$error.server}">Username:<span class='asterix'>*</span></label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[Username].$error.server}" type="text" ng-model="Username" ng-required="true" placeholder="value"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Username].$error.server}" ng-show="GOINPUTNAME[Username].$error.server">{{GOINPUTNAME[Username].$error.server}}</span>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSAccessKey].$error.server}">AWS Access Key Id:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSAccessKey].$error.server}" type="text" ng-model="AWSAccessKey" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSAccessKey].$error.server}" ng-show="GOINPUTNAME[AWSAccessKey].$error.server">{{GOINPUTNAME[AWSAccessKey].$error.server}}</span>
 </div>
 
 <div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Password].$error.server}">Password:<span class='asterix'>*</span></label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[Password].$error.server}" type="password" ng-model="Password" ng-required="true" placeholder="value"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Password].$error.server}" ng-show="GOINPUTNAME[Password].$error.server">{{GOINPUTNAME[Password].$error.server}}</span>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSSecretAccessKey].$error.server}">AWS Secret Access Key:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSSecretAccessKey].$error.server}" type="awssecretaccesskey" ng-model="AWSSecretAccessKey" ng-required="true" placeholder="value"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSSecretAccessKey].$error.server}" ng-show="GOINPUTNAME[AWSSecretAccessKey].$error.server">{{GOINPUTNAME[AWSSecretAccessKey].$error.server}}</span>
 </div>

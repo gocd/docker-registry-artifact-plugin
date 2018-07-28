@@ -28,9 +28,9 @@ public class RegistryAuthSupplierChain implements RegistryAuthSupplier {
 
     public RegistryAuthSupplierChain(ArtifactStoreConfig artifactStoreConfig) {
         registryAuth = RegistryAuth.builder()
-                .username(artifactStoreConfig.getUsername())
-                .serverAddress(artifactStoreConfig.getRegistryUrl())
-                .password(artifactStoreConfig.getPassword()).build();
+                .username(artifactStoreConfig.getAwsaccesskey())
+                .serverAddress(artifactStoreConfig.getS3bucket())
+                .password(artifactStoreConfig.getAwssecretaccesskey()).build();
     }
 
     @Override

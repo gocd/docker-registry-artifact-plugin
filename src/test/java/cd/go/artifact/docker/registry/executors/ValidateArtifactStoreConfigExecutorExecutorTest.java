@@ -47,16 +47,16 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
 
         String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"key\": \"RegistryURL\",\n" +
-                "    \"message\": \"RegistryURL must not be blank.\"\n" +
+                "    \"key\": \"S3Bucket\",\n" +
+                "    \"message\": \"S3Bucket must not be blank.\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Password\",\n" +
-                "    \"message\": \"Password must not be blank.\"\n" +
+                "    \"key\": \"AWSAccessKey\",\n" +
+                "    \"message\": \"AWSAccessKey must not be blank.\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Username\",\n" +
-                "    \"message\": \"Username must not be blank.\"\n" +
+                "    \"key\": \"AWSSecretAccessKey\",\n" +
+                "    \"message\": \"AWSSecretAccessKey must not be blank.\"\n" +
                 "  }\n" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -65,9 +65,9 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
     @Test
     public void shouldValidateProperData() throws JSONException {
         String requestBody = new JSONObject()
-                .put("RegistryURL", "http://localhost/index")
-                .put("Username", "chuck-norris")
-                .put("Password", "chuck-norris-doesnt-need-passwords")
+                .put("S3Bucket", "http://localhost/index")
+                .put("AWSAccessKey", "chuck-norris")
+                .put("AWSSecretAccessKey", "chuck-norris-doesnt-need-passwords")
                 .toString();
         when(request.requestBody()).thenReturn(requestBody);
 

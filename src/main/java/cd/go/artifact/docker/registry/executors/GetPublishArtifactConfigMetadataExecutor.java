@@ -18,19 +18,16 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
 import cd.go.artifact.docker.registry.annotation.MetadataHelper;
-import cd.go.artifact.docker.registry.model.BuildFileArtifactPlanConfig;
-import cd.go.artifact.docker.registry.model.ImageTagArtifactPlanConfig;
+import cd.go.artifact.docker.registry.model.SourceFileArtifactPlanConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-
 import java.util.List;
 
 public class GetPublishArtifactConfigMetadataExecutor implements RequestExecutor {
 
     public GoPluginApiResponse execute() {
-        final List<ConfigMetadata> metadata = MetadataHelper.getMetadata(BuildFileArtifactPlanConfig.class);
-        metadata.addAll(MetadataHelper.getMetadata(ImageTagArtifactPlanConfig.class));
+        final List<ConfigMetadata> metadata = MetadataHelper.getMetadata(SourceFileArtifactPlanConfig.class);
         return DefaultGoPluginApiResponse.success(Util.GSON.toJson(metadata));
     }
 }

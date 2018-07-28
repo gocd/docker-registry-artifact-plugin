@@ -30,21 +30,21 @@ public class GetArtifactStoreConfigMetadataExecutorTest {
 
         final String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"key\": \"RegistryURL\",\n" +
+                "    \"key\": \"S3Bucket\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Username\",\n" +
+                "    \"key\": \"AWSAccessKey\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Password\",\n" +
+                "    \"key\": \"AWSSecretAccessKey\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": true\n" +

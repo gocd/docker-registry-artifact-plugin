@@ -45,7 +45,7 @@ def PLUGIN_VERSION = '1.0.0'
 def DIST_VERSION = releaseRevision()
 def GIT_REVISION = gitRevision()
 
-group = 'cd.go.artifact.docker'
+group = 'cd.go.artifact.s3'
 project.ext.pluginVersion = PLUGIN_VERSION
 rootProject.ext.distVersion = DIST_VERSION
 rootProject.ext.fullVersion = DIST_VERSION ? "${PLUGIN_VERSION}-${DIST_VERSION}" : PLUGIN_VERSION
@@ -54,12 +54,12 @@ version = project.fullVersion
 
 
 project.ext.pluginDesc = [
-  id         : 'cd.go.artifact.docker.registry',
+  id         : 'cd.go.artifact.s3',
   version    : project.version,
   goCdVersion: '18.7.0',
-  name       : 'Artifact plugin for docker',
-  description: 'Plugin allows to push/pull docker image from public or private docker registry',
-  vendorName : 'GoCD Contributors',
+  name       : 'Artifact plugin for S3',
+  description: 'Plugin allows to push/pull artifacts using Amazon S3',
+  vendorName : 'Diogomrol',
   vendorUrl  : 'https://github.com/gocd/docker-artifact-plugin'
 ]
 

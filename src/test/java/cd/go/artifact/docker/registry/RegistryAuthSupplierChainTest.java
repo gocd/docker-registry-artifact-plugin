@@ -16,7 +16,6 @@
 
 package cd.go.artifact.docker.registry;
 
-import cd.go.artifact.docker.registry.RegistryAuthSupplierChain;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import com.spotify.docker.client.messages.RegistryAuth;
 import org.junit.Test;
@@ -31,8 +30,8 @@ public class RegistryAuthSupplierChainTest {
         final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig);
 
         final RegistryAuth registryAuth = registryAuthSupplierChain.authFor("foo");
-        assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getRegistryUrl());
-        assertThat(registryAuth.username()).isEqualTo(artifactStoreConfig.getUsername());
-        assertThat(registryAuth.password()).isEqualTo(artifactStoreConfig.getPassword());
+        assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getS3bucket());
+        assertThat(registryAuth.username()).isEqualTo(artifactStoreConfig.getAwsaccesskey());
+        assertThat(registryAuth.password()).isEqualTo(artifactStoreConfig.getAwssecretaccesskey());
     }
 }

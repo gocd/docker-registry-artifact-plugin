@@ -40,7 +40,7 @@ public class DockerClientFactory {
         final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig);
         DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuthSupplier(registryAuthSupplier).build();
 
-        LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getRegistryUrl()));
+        LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getS3bucket()));
 
         final String result = docker.ping();
         if (!result.equalsIgnoreCase("OK")) {

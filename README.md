@@ -33,7 +33,7 @@ There are three levels of configuration needed in order for publishing and fetch
    - Specify the store id
    - Choose the docker registry artifact plugin
    - Specify the `Docker Registry Url`
-   - Specify `username` and `password`
+   - Specify `awsaccesskey` and `awssecretaccesskey`
 
    ![](images/artifact_store.png)
 

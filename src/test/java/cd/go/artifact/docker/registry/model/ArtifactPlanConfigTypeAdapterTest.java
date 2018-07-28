@@ -17,34 +17,16 @@ import static org.junit.Assert.fail;
 public class ArtifactPlanConfigTypeAdapterTest {
 
     @Test
-    public void shouldAllowBlankTagAndDefaultToLatest() throws JSONException {
-        List<String> inputs = Arrays.asList(
-                new JSONObject().put("Image", "alpine").toString(),
-                new JSONObject().put("Image", "alpine").put("Tag", "").toString(),
-                new JSONObject().put("Image", "alpine").put("Tag", (String) null).toString(),
-                new JSONObject().put("Image", "alpine").toString());
-
-        for (String json : inputs) {
-            ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
-
-            assertThat(artifactPlanConfig).isInstanceOf(ImageTagArtifactPlanConfig.class);
-            assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getImage()).isEqualTo("alpine");
-            assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getTag()).isEqualTo("latest");
-        }
-    }
-
-    @Test
     public void shouldDeserializeToBuildFilePlanConfig() throws JSONException {
         List<String> inputs = Arrays.asList(
-                new JSONObject().put("BuildFile", "info.json").put("Tag", "").put("Image", "").toString(),
-                new JSONObject().put("BuildFile", "info.json").toString(),
-                new JSONObject().put("BuildFile", "info.json").put("Image", (String) null).toString());
+                new JSONObject().put("Source", "info.json").toString(),
+                new JSONObject().put("Source", "info.json").toString());
 
         for (String json : inputs) {
             ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
 
-            assertThat(artifactPlanConfig).isInstanceOf(BuildFileArtifactPlanConfig.class);
-            assertThat(((BuildFileArtifactPlanConfig) artifactPlanConfig).getBuildFile()).isEqualTo("info.json");
+            assertThat(artifactPlanConfig).isInstanceOf(SourceFileArtifactPlanConfig.class);
+            assertThat(((SourceFileArtifactPlanConfig) artifactPlanConfig).getSource()).isEqualTo("info.json");
         }
     }
 
@@ -61,15 +43,5 @@ public class ArtifactPlanConfigTypeAdapterTest {
                 assertThat(e.getMessage()).isEqualTo("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
             }
         }
-    }
-
-
-    @Test
-    public void shouldParseConfigurationsWithJsonNull() throws JSONException {
-        String json = "{\"BuildFile\": null, \"Image\": \"alpine\"}";
-        ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
-
-        assertThat(artifactPlanConfig).isInstanceOf(ImageTagArtifactPlanConfig.class);
-        assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getImage()).isEqualTo("alpine");
     }
 }

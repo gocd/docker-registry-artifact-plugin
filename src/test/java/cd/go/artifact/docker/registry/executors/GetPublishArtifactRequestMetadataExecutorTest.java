@@ -29,9 +29,7 @@ public class GetPublishArtifactRequestMetadataExecutorTest {
         final GoPluginApiResponse response = new GetPublishArtifactConfigMetadataExecutor().execute();
 
         final String expectedJSON = "[" +
-                "{\"key\":\"BuildFile\",\"metadata\":{\"required\":false,\"secure\":false}}," +
-                "{\"key\":\"Image\",\"metadata\":{\"required\":false,\"secure\":false}}," +
-                "{\"key\":\"Tag\",\"metadata\":{\"required\":false,\"secure\":false}}" +
+                "{\"key\":\"Source\",\"metadata\":{\"required\":false,\"secure\":false}}," +
                 "]";
 
         assertThat(response.responseCode()).isEqualTo(200);

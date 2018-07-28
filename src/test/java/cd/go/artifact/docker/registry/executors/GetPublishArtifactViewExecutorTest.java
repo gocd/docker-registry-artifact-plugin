@@ -18,8 +18,7 @@ package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
 import cd.go.artifact.docker.registry.annotation.MetadataHelper;
-import cd.go.artifact.docker.registry.model.BuildFileArtifactPlanConfig;
-import cd.go.artifact.docker.registry.model.ImageTagArtifactPlanConfig;
+import cd.go.artifact.docker.registry.model.SourceFileArtifactPlanConfig;
 import cd.go.artifact.docker.registry.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -47,8 +46,7 @@ public class GetPublishArtifactViewExecutorTest extends ViewTest {
     @Override
     protected List<ConfigMetadata> getMetadataList() {
         List<ConfigMetadata> configMetadata = new ArrayList<>();
-        configMetadata.addAll(MetadataHelper.getMetadata(BuildFileArtifactPlanConfig.class));
-        configMetadata.addAll(MetadataHelper.getMetadata(ImageTagArtifactPlanConfig.class));
+        configMetadata.addAll(MetadataHelper.getMetadata(SourceFileArtifactPlanConfig.class));
         return configMetadata;
     }
 

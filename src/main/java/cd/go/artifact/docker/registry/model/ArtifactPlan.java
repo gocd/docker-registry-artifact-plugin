@@ -19,8 +19,6 @@ package cd.go.artifact.docker.registry.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Optional;
-
 public class ArtifactPlan {
     @Expose
     @SerializedName("id")
@@ -37,16 +35,10 @@ public class ArtifactPlan {
     public ArtifactPlan() {
     }
 
-    public ArtifactPlan(String id, String storeId, String buildFile) {
+    public ArtifactPlan(String id, String storeId, String sourceFile) {
         this.id = id;
         this.storeId = storeId;
-        this.artifactPlanConfig = new BuildFileArtifactPlanConfig(buildFile);
-    }
-
-    public ArtifactPlan(String id, String storeId, String image, Optional<String> tag) {
-        this.id = id;
-        this.storeId = storeId;
-        this.artifactPlanConfig = new ImageTagArtifactPlanConfig(image, tag);
+        this.artifactPlanConfig = new SourceFileArtifactPlanConfig(sourceFile);
     }
 
     public String getId() {

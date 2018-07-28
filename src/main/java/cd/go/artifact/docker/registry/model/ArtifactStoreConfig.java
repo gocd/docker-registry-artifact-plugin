@@ -24,40 +24,40 @@ import com.google.gson.annotations.SerializedName;
 
 public class ArtifactStoreConfig implements Validatable {
     @Expose
-    @SerializedName("RegistryURL")
-    @FieldMetadata(key = "RegistryURL", required = true)
-    private String registryUrl;
+    @SerializedName("S3Bucket")
+    @FieldMetadata(key = "S3Bucket", required = true)
+    private String s3bucket;
 
     @Expose
-    @SerializedName("Username")
-    @FieldMetadata(key = "Username", required = true)
-    private String username;
+    @SerializedName("AWSAccessKey")
+    @FieldMetadata(key = "AWSAccessKey", required = true)
+    private String awsaccesskey;
 
     @Expose
-    @SerializedName("Password")
-    @FieldMetadata(key = "Password", required = true, secure = true)
-    private String password;
+    @SerializedName("AWSSecretAccessKey")
+    @FieldMetadata(key = "AWSSecretAccessKey", required = true, secure = true)
+    private String awssecretaccesskey;
 
 
     public ArtifactStoreConfig() {
     }
 
-    public ArtifactStoreConfig(String registryUrl,String username, String password) {
-        this.registryUrl = registryUrl;
-        this.username = username;
-        this.password = password;
+    public ArtifactStoreConfig(String s3bucket, String awsaccesskey, String awssecretaccesskey) {
+        this.s3bucket = s3bucket;
+        this.awsaccesskey = awsaccesskey;
+        this.awssecretaccesskey = awssecretaccesskey;
     }
 
-    public String getRegistryUrl() {
-        return registryUrl;
+    public String getS3bucket() {
+        return s3bucket;
     }
 
-    public String getUsername() {
-        return username;
+    public String getAwsaccesskey() {
+        return awsaccesskey;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAwssecretaccesskey() {
+        return awssecretaccesskey;
     }
 
     @Override
@@ -67,16 +67,16 @@ public class ArtifactStoreConfig implements Validatable {
 
         ArtifactStoreConfig that = (ArtifactStoreConfig) o;
 
-        if (registryUrl != null ? !registryUrl.equals(that.registryUrl) : that.registryUrl != null) return false;
-        if (username != null ? !username.equals(that.username) : that.username != null) return false;
-        return password != null ? password.equals(that.password) : that.password == null;
+        if (s3bucket != null ? !s3bucket.equals(that.s3bucket) : that.s3bucket != null) return false;
+        if (awsaccesskey != null ? !awsaccesskey.equals(that.awsaccesskey) : that.awsaccesskey != null) return false;
+        return awssecretaccesskey != null ? awssecretaccesskey.equals(that.awssecretaccesskey) : that.awssecretaccesskey == null;
     }
 
     @Override
     public int hashCode() {
-        int result = registryUrl != null ? registryUrl.hashCode() : 0;
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
+        int result = s3bucket != null ? s3bucket.hashCode() : 0;
+        result = 31 * result + (awsaccesskey != null ? awsaccesskey.hashCode() : 0);
+        result = 31 * result + (awssecretaccesskey != null ? awssecretaccesskey.hashCode() : 0);
         return result;
     }
 

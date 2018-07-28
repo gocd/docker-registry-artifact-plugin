@@ -27,16 +27,16 @@ public class PublishArtifactRequestTest {
         final String json = "{\n" +
                 "  \"artifact_plan\": {\n" +
                 "    \"configuration\": {\n" +
-                "      \"BuildFile\": \"alpine-build.json\"\n" +
+                "      \"Source\": \"alpine-build.json\"\n" +
                 "    },\n" +
                 "    \"id\": \"installers\",\n" +
                 "    \"storeId\": \"s3-store\"\n" +
                 "  },\n" +
                 "  \"artifact_store\": {\n" +
                 "    \"configuration\": {\n" +
-                "      \"RegistryURL\": \"public-registry-url\",\n" +
-                "      \"Username\": \"username\",\n" +
-                "      \"Password\": \"password\"\n" +
+                "      \"S3Bucket\": \"s3-url\",\n" +
+                "      \"AWSAccessKey\": \"aws-access-key\",\n" +
+                "      \"AWSSecretAccessKey\": \"aws-secret-access-key\"\n" +
                 "    },\n" +
                 "    \"id\": \"s3-store\"\n" +
                 "  },\n" +
@@ -49,7 +49,7 @@ public class PublishArtifactRequestTest {
 
         assertThat(publishArtifactRequest.getArtifactStore().getId()).isEqualTo("s3-store");
         assertThat(publishArtifactRequest.getArtifactStore().getArtifactStoreConfig())
-                .isEqualTo(new ArtifactStoreConfig("public-registry-url", "username", "password"));
+                .isEqualTo(new ArtifactStoreConfig("s3-url", "aws-access-key", "aws-secret-access-key"));
 
         assertThat(publishArtifactRequest.getArtifactPlan())
                 .isEqualTo(new ArtifactPlan("installers", "s3-store", "alpine-build.json"));

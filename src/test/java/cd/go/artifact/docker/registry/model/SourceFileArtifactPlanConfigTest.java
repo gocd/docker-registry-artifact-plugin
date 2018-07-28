@@ -34,7 +34,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class BuildFileArtifactPlanConfigTest {
+public class SourceFileArtifactPlanConfigTest {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
     @Rule
@@ -54,7 +54,7 @@ public class BuildFileArtifactPlanConfigTest {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "{\"image\":\"alpine\",\"tag\":\"3.6\"}".getBytes());
 
-        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
+        final ArtifactPlanConfig artifactPlanConfig = new SourceFileArtifactPlanConfig("build-file.json");
         final DockerImage dockerImage = artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
 
         assertThat(dockerImage.getImage()).isEqualTo("alpine");
@@ -65,7 +65,7 @@ public class BuildFileArtifactPlanConfigTest {
     public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException, UnresolvedPropertyException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "bar".getBytes());
-        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
+        final ArtifactPlanConfig artifactPlanConfig = new SourceFileArtifactPlanConfig("build-file.json");
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
@@ -77,7 +77,7 @@ public class BuildFileArtifactPlanConfigTest {
     public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException, UnresolvedPropertyException {
         Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
         Files.write(file, "[{}]".getBytes());
-        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
+        final ArtifactPlanConfig artifactPlanConfig = new SourceFileArtifactPlanConfig("build-file.json");
 
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
@@ -87,7 +87,7 @@ public class BuildFileArtifactPlanConfigTest {
 
     @Test
     public void shouldErrorOutWhenFileDoesNotExist() throws UnresolvedPropertyException {
-        final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("random.json");
+        final ArtifactPlanConfig artifactPlanConfig = new SourceFileArtifactPlanConfig("random.json");
 
         thrown.expect(RuntimeException.class);
         if (SystemUtils.IS_OS_WINDOWS) {

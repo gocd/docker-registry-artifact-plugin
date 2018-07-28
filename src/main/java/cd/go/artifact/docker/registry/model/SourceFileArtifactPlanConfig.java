@@ -10,27 +10,27 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-public class BuildFileArtifactPlanConfig extends ArtifactPlanConfig {
+public class SourceFileArtifactPlanConfig extends ArtifactPlanConfig {
     @Expose
-    @SerializedName("BuildFile")
-    @FieldMetadata(key = "BuildFile")
-    private String buildFile;
+    @SerializedName("Source")
+    @FieldMetadata(key = "Source")
+    private String source;
 
-    public BuildFileArtifactPlanConfig(String buildFile) {
-        this.buildFile = buildFile;
+    public SourceFileArtifactPlanConfig(String source) {
+        this.source = source;
     }
 
-    public String getBuildFile() {
-        return buildFile;
+    public String getSource() {
+        return source;
     }
 
 
     @Override
     public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {
         try {
-            return DockerImage.fromFile(new File(agentWorkingDirectory, getBuildFile()));
+            return DockerImage.fromFile(new File(agentWorkingDirectory, getSource()));
         } catch (JsonSyntaxException e) {
-            throw new RuntimeException(String.format("File[%s] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.", buildFile));
+            throw new RuntimeException(String.format("File[%s] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.", source));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -40,12 +40,12 @@ public class BuildFileArtifactPlanConfig extends ArtifactPlanConfig {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BuildFileArtifactPlanConfig that = (BuildFileArtifactPlanConfig) o;
-        return Objects.equals(buildFile, that.buildFile);
+        SourceFileArtifactPlanConfig that = (SourceFileArtifactPlanConfig) o;
+        return Objects.equals(source, that.source);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(buildFile);
+        return Objects.hash(source);
     }
 }

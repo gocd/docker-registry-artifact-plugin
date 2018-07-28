@@ -1,17 +1,5 @@
 <div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Image:</label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[Image].$error.server}" type="text" ng-model="Image" placeholder="gocd/app-image"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Image].$error.server}" ng-show="GOINPUTNAME[Image].$error.server">{{GOINPUTNAME[Image].$error.server}}</span>
-</div>
-
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Tag].$error.server}">Tag Pattern:</label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[Tag].$error.server}" type="text" ng-model="Tag" placeholder="v${GO_PIPELINE_COUNTER}"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Tag].$error.server}" ng-show="GOINPUTNAME[Tag].$error.server">{{GOINPUTNAME[Tag].$error.server}}</span>
-</div>
-
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[BuildFile].$error.server}">Build File:</label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[BuildFile].$error.server}" type="text" ng-model="BuildFile" placeholder="buildfile.json"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[BuildFile].$error.server}" ng-show="GOINPUTNAME[BuildFile].$error.server">{{GOINPUTNAME[BuildFile].$error.server}}</span>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Source].$error.server}">Source:</label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[Source].$error.server}" type="text" ng-model="Source" placeholder="source_file.txt"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Source].$error.server}" ng-show="GOINPUTNAME[Source].$error.server">{{GOINPUTNAME[Source].$error.server}}</span>
 </div>

@@ -56,15 +56,15 @@ public class PublishArtifactExecutor implements RequestExecutor {
             final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir(),
                     publishArtifactRequest.getEnvironmentVariables());
 
-            LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
-            consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
+            LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
+            consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
 
             docker.push(image.toString(), progressHandler);
             docker.close();
 
             publishArtifactResponse.addMetadata("image", image.toString());
             publishArtifactResponse.addMetadata("digest", progressHandler.getDigest());
-            consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
+            consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
             return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
         } catch (Exception e) {
             consoleLogger.error(String.format("Failed to publish %s: %s", artifactPlan, e));
