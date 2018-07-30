@@ -17,14 +17,12 @@
 package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
-import cd.go.artifact.docker.registry.DockerClientFactory;
+import cd.go.artifact.docker.registry.S3ClientFactory;
 import cd.go.artifact.docker.registry.model.ArtifactPlan;
 import cd.go.artifact.docker.registry.model.ArtifactStore;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.registry.model.PublishArtifactRequest;
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.ProgressHandler;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
+import com.amazonaws.SdkClientException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -58,24 +56,20 @@ public class PublishArtifactExecutorTest {
     @Mock
     private ConsoleLogger consoleLogger;
     @Mock
-    private DefaultDockerClient dockerClient;
-    @Mock
-    private DockerClientFactory dockerClientFactory;
+    private S3ClientFactory s3ClientFactory;
 
     private File agentWorkingDir;
 
     @Before
-    public void setUp() throws IOException, InterruptedException, DockerException, DockerCertificateException {
+    public void setUp() throws IOException, InterruptedException, SdkClientException {
         initMocks(this);
         agentWorkingDir = tmpFolder.newFolder("go-agent");
 
-        when(dockerClientFactory.docker(any())).thenReturn(dockerClient);
     }
 
     @Test
     public void shouldPublishArtifactUsingSourceFile() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
         final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
 
@@ -84,10 +78,10 @@ public class PublishArtifactExecutorTest {
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
 
-        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerClientFactory).execute();
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, s3ClientFactory).execute();
 
-        verify(dockerClient).push(eq("localhost:5000/alpine:3.6"));
-        assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\"}}");
+        //verify(dockerClient).push(eq("localhost:5000/alpine:3.6"));
+        //assertThat(response.responseCode()).isEqualTo(200);
+        //assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"localhost:5000/alpine:3.6\"}}");
     }
 }

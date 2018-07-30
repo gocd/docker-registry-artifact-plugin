@@ -25,16 +25,6 @@ public class SourceFileArtifactPlanConfig extends ArtifactPlanConfig {
         return source;
     }
 
-    @Override
-    public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) {
-        try {
-            return DockerImage.fromFile(new File(agentWorkingDirectory, getSource()));
-        } catch (JsonSyntaxException e) {
-            throw new RuntimeException(String.format("File[%s] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.", source));
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
     @Override
     public boolean equals(Object o) {

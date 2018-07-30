@@ -48,12 +48,8 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
-                "    'key': 'BuildFile'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
-                "  }," +
-                "  {" +
-                "    'key': 'Image'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "    'key': 'Source'," +
+                "    'message': 'Source file must be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -62,8 +58,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
     @Test
     public void shouldValidateRequestWithImageAndTag() throws JSONException {
         String requestBody = new JSONObject()
-                .put("Image", "")
-                .put("Tag", "")
+                .put("Source", "")
                 .toString();
         when(request.requestBody()).thenReturn(requestBody);
 
@@ -71,12 +66,8 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
-                "    'key': 'BuildFile'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
-                "  }," +
-                "  {" +
-                "    'key': 'Image'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "    'key': 'Source'," +
+                "    'message': 'Source file must be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -90,12 +81,8 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedJSON = "[" +
                 "  {" +
-                "    'key': 'BuildFile'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
-                "  }," +
-                "  {" +
-                "    'key': 'Image'," +
-                "    'message': 'Either `Image` or `BuildFile` should be specified.'" +
+                "    'key': 'Source'," +
+                "    'message': 'Source file must be specified.'" +
                 "  }" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
@@ -104,9 +91,7 @@ public class ValidatePublishArtifactConfigExecutorTest {
     @Test
     public void shouldValidateRequestContainingAllFields() throws JSONException {
         String requestBody = new JSONObject()
-                .put("BuildFile", "build.json")
-                .put("Image", "alpine")
-                .put("Tag", "latest")
+                .put("DummyProp", "build.json")
                 .toString();
         when(request.requestBody()).thenReturn(requestBody);
 
@@ -114,11 +99,9 @@ public class ValidatePublishArtifactConfigExecutorTest {
 
         String expectedResponse = new JSONArray().put(
                 new JSONObject()
-                        .put("key", "Image")
-                        .put("message", "Either `Image` or `BuildFile` should be specified.")
-        ).put(new JSONObject()
-                .put("key", "BuildFile")
-                .put("message", "Either `Image` or `BuildFile` should be specified.")).toString();
+                        .put("key", "Source")
+                        .put("message", "Source file must be specified.")
+        ).toString();
 
         JSONAssert.assertEquals(expectedResponse, response.responseBody(), true);
     }

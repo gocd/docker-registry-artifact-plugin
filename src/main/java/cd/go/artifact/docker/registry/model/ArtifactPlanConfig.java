@@ -23,7 +23,6 @@ import java.util.Map;
 
 public abstract class ArtifactPlanConfig implements Validatable {
 
-    abstract public DockerImage imageToPush(String agentWorkingDirectory, Map<String, String> environmentVariables) throws UnresolvedPropertyException;
     abstract public String getSource();
 
     @Override

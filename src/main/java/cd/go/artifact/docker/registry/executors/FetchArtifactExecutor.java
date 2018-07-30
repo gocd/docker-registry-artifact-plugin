@@ -17,9 +17,12 @@
 package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
-import cd.go.artifact.docker.registry.DockerClientFactory;
+import cd.go.artifact.docker.registry.S3ClientFactory;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.registry.utils.Util;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.spotify.docker.client.DockerClient;
@@ -27,6 +30,8 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Map;
 
 import static cd.go.artifact.docker.registry.S3ArtifactPlugin.LOG;
@@ -35,13 +40,13 @@ import static java.lang.String.format;
 public class FetchArtifactExecutor implements RequestExecutor {
     private FetchArtifactRequest fetchArtifactRequest;
     private final ConsoleLogger consoleLogger;
-    private DockerClientFactory clientFactory;
+    private S3ClientFactory clientFactory;
 
     public FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger) {
-        this(request, consoleLogger, DockerClientFactory.instance());
+        this(request, consoleLogger, S3ClientFactory.instance());
     }
 
-    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, DockerClientFactory clientFactory) {
+    FetchArtifactExecutor(GoPluginApiRequest request, ConsoleLogger consoleLogger, S3ClientFactory clientFactory) {
         this.fetchArtifactRequest = FetchArtifactRequest.fromJSON(request.requestBody());
         this.consoleLogger = consoleLogger;
         this.clientFactory = clientFactory;
@@ -53,20 +58,28 @@ public class FetchArtifactExecutor implements RequestExecutor {
             final Map<String, String> artifactMap = fetchArtifactRequest.getMetadata();
             validateMetadata(artifactMap);
 
-            final String imageToPull = artifactMap.get("image");
+            final String sourceFileToGet = artifactMap.get("Source");
 
-            consoleLogger.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
-            LOG.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
+            consoleLogger.info(String.format("Retrieving file `%s` from S3 bucket `%s`.", sourceFileToGet, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
+            LOG.info(String.format("Retrieving file `%s` from S3 bucket `%s`.", sourceFileToGet, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
 
-            DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-            docker.pull(imageToPull);
-            docker.close();
+            AmazonS3 s3 = clientFactory.s3(fetchArtifactRequest.getArtifactStoreConfig());
+            S3Object s3Object = s3.getObject(fetchArtifactRequest.getArtifactStoreConfig().getS3bucket(), sourceFileToGet);
+            S3ObjectInputStream s3InputStream = s3Object.getObjectContent();
+            FileOutputStream fileOutput = new FileOutputStream(new File(sourceFileToGet));
+            byte[] read_buf = new byte[1024];
+            int read_len = 0;
+            while ((read_len = s3InputStream.read(read_buf)) > 0) {
+                fileOutput.write(read_buf, 0, read_len);
+            }
+            s3InputStream.close();
+            fileOutput.close();
 
-            consoleLogger.info(String.format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
+            consoleLogger.info(String.format("Source `%s` successfully pulled from S3 bucket `%s`.", sourceFileToGet, fetchArtifactRequest.getArtifactStoreConfig().getS3bucket()));
 
             return DefaultGoPluginApiResponse.success("");
         } catch (Exception e) {
-            final String message = format("Failed pull docker image: %s", e);
+            final String message = format("Failed pull source file: %s", e);
             consoleLogger.error(message);
             LOG.error(message);
             return DefaultGoPluginApiResponse.error(message);
@@ -75,15 +88,11 @@ public class FetchArtifactExecutor implements RequestExecutor {
 
     public void validateMetadata(Map<String, String> artifactMap) {
         if (artifactMap == null) {
-            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata is null."));
+            throw new RuntimeException(String.format("Cannot fetch the source file from S3: Invalid metadata received from the GoCD server. The artifact metadata is null."));
         }
 
-        if (!artifactMap.containsKey("image")) {
-            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata must contain the key `%s`.", "image"));
-        }
-
-        if (!artifactMap.containsKey("digest")) {
-            throw new RuntimeException(format("Cannot fetch the docker image from registry: Invalid metadata received from the GoCD server. The artifact metadata must contain the key `%s`.", "digest"));
+        if (!artifactMap.containsKey("Source")) {
+            throw new RuntimeException(String.format("Cannot fetch the source file from S3: Invalid metadata received from the GoCD server. The artifact metadata must contain the key `%s`.", "source"));
         }
     }
 

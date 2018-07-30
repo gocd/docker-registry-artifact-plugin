@@ -29,8 +29,7 @@ public class GetArtifactStoreViewExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("template", Util.readResource("/artifact-store.template.html"));
-        DefaultGoPluginApiResponse defaultGoPluginApiResponse = DefaultGoPluginApiResponse.success( GSON.toJson(jsonObject));
-        return defaultGoPluginApiResponse;
+        return DefaultGoPluginApiResponse.success( GSON.toJson(jsonObject));
     }
 
 }

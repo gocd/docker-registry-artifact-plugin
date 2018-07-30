@@ -17,14 +17,11 @@
 package cd.go.artifact.docker.registry.executors;
 
 import cd.go.artifact.docker.registry.ConsoleLogger;
-import cd.go.artifact.docker.registry.DockerClientFactory;
 import cd.go.artifact.docker.registry.S3ClientFactory;
 import cd.go.artifact.docker.registry.model.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.spotify.docker.client.DockerClient;
-import com.sun.org.apache.bcel.internal.classfile.SourceFile;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -33,7 +30,6 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import static cd.go.artifact.docker.registry.S3ArtifactPlugin.LOG;
-import static java.lang.String.format;
 
 public class PublishArtifactExecutor implements RequestExecutor {
     private final PublishArtifactRequest publishArtifactRequest;
@@ -68,8 +64,9 @@ public class PublishArtifactExecutor implements RequestExecutor {
             request.setMetadata(metadata);
             s3.putObject(request);
 
-            publishArtifactResponse.addMetadata("image", image.toString());
-            consoleLogger.info(format("Image `%s` successfully pushed to docker registry `%s`.", image, artifactStoreConfig.getS3bucket()));
+            publishArtifactResponse.addMetadata("source", sourceFile);
+            consoleLogger.info(String.format("Source file `%s` successfully pushed to S3 bucket `%s`.", sourceFile, artifactStoreConfig.getS3bucket()));
+
             return DefaultGoPluginApiResponse.success(publishArtifactResponse.toJSON());
         } catch (Exception e) {
             consoleLogger.error(String.format("Failed to publish %s: %s", artifactPlan, e));
