@@ -1,1 +1,5 @@
-<div></div>
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[EnvironmentVariablePrefix].$error.server}">Environment Variable Prefix:</label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[EnvironmentVariablePrefix].$error.server}" type="text" ng-model="EnvironmentVariablePrefix" placeholder="PREFIX"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[EnvironmentVariablePrefix].$error.server}" ng-show="GOINPUTNAME[EnvironmentVariablePrefix].$error.server">{{GOINPUTNAME[EnvironmentVariablePrefix].$error.server}}</span>
+</div>

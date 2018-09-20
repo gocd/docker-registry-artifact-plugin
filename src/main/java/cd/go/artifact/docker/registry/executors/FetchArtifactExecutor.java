@@ -20,13 +20,17 @@ import cd.go.artifact.docker.registry.ConsoleLogger;
 import cd.go.artifact.docker.registry.DockerClientFactory;
 import cd.go.artifact.docker.registry.DockerProgressHandler;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
+import cd.go.artifact.docker.registry.model.FetchArtifactConfig;
 import cd.go.artifact.docker.registry.utils.Util;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
@@ -55,7 +59,9 @@ public class FetchArtifactExecutor implements RequestExecutor {
         try {
             final Map<String, String> artifactMap = fetchArtifactRequest.getMetadata();
             validateMetadata(artifactMap);
+            FetchArtifactConfig fetchArtifactConfig = fetchArtifactRequest.getFetchArtifactConfig();
 
+            final String artifactPrefix = fetchArtifactConfig.getEnvironmentVariablePrefix();
             final String imageToPull = artifactMap.get("image");
 
             consoleLogger.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
@@ -71,7 +77,14 @@ public class FetchArtifactExecutor implements RequestExecutor {
                 throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
             }
 
-            return DefaultGoPluginApiResponse.success("");
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("name", StringUtils.isEmpty(artifactPrefix) ? "ARTIFACT_IMAGE" : String.format("%s_ARTIFACT_IMAGE", artifactPrefix));
+            jsonObject.addProperty("value", imageToPull);
+
+            JsonArray jsonElements = new JsonArray();
+            jsonElements.add(jsonObject);
+
+            return DefaultGoPluginApiResponse.success(jsonElements.toString());
         } catch (Exception e) {
             final String message = format("Failed pull docker image: %s", e);
             consoleLogger.error(message);
@@ -95,9 +108,15 @@ public class FetchArtifactExecutor implements RequestExecutor {
     }
 
     protected static class FetchArtifactRequest {
+
+        @Expose
+        @SerializedName("fetch_artifact_configuration")
+        private FetchArtifactConfig fetchArtifactConfig;
+
         @Expose
         @SerializedName("store_configuration")
         private ArtifactStoreConfig artifactStoreConfig;
+
         @Expose
         @SerializedName("artifact_metadata")
         private Map<String, String> metadata;
@@ -105,9 +124,10 @@ public class FetchArtifactExecutor implements RequestExecutor {
         public FetchArtifactRequest() {
         }
 
-        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, Map<String, String> metadata) {
+        public FetchArtifactRequest(ArtifactStoreConfig artifactStoreConfig, Map<String, String> metadata, FetchArtifactConfig fetchArtifactConfig) {
             this.artifactStoreConfig = artifactStoreConfig;
             this.metadata = metadata;
+            this.fetchArtifactConfig = fetchArtifactConfig;
         }
 
         public ArtifactStoreConfig getArtifactStoreConfig() {
@@ -120,6 +140,10 @@ public class FetchArtifactExecutor implements RequestExecutor {
 
         public static FetchArtifactRequest fromJSON(String json) {
             return Util.GSON.fromJson(json, FetchArtifactRequest.class);
+        }
+
+        public FetchArtifactConfig getFetchArtifactConfig() {
+            return fetchArtifactConfig;
         }
     }
 }

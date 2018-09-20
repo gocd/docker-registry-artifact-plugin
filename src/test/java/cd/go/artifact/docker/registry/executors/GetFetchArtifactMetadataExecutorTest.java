@@ -27,8 +27,7 @@ public class GetFetchArtifactMetadataExecutorTest {
     @Test
     public void shouldReturnFetchArtifactMetadata() throws JSONException {
         final GoPluginApiResponse response = new GetFetchArtifactMetadataExecutor().execute();
-
-        final String expectedJSON = "[]";
+        final String expectedJSON = "[{\"key\":\"EnvironmentVariablePrefix\",\"metadata\":{\"required\":false,\"secure\":false}}]";
 
         assertThat(response.responseCode()).isEqualTo(200);
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
