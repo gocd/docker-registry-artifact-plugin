@@ -20,6 +20,7 @@ import cd.go.artifact.docker.registry.ConsoleLogger;
 import cd.go.artifact.docker.registry.DockerClientFactory;
 import cd.go.artifact.docker.registry.DockerProgressHandler;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
+import cd.go.artifact.docker.registry.model.FetchArtifactConfig;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
@@ -69,7 +70,10 @@ public class FetchArtifactExecutorTest {
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
+
+        FetchArtifactConfig fetchArtifactConfig = new FetchArtifactConfig("PREFIX");
+
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, fetchArtifactConfig);
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("foo");
@@ -77,8 +81,26 @@ public class FetchArtifactExecutorTest {
         final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
         assertThat(response.responseCode()).isEqualTo(200);
-        assertThat(response.responseBody()).isEqualTo("");
+        assertThat(response.responseBody()).isEqualTo("[{\"name\":\"PREFIX_ARTIFACT_IMAGE\",\"value\":\"localhost:5000/alpine:v1\"}]");
     }
+
+    @Test
+    public void shouldSetEnvironmentVariablesWithImageInformationInResponseRegardlessOfWhetherThePrefixIsProvided() {
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", "localhost:5000/alpine:v1");
+        artifactMetadata.put("digest", "foo");
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, new FetchArtifactConfig());
+
+        when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
+
+        final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+
+        assertThat(response.responseCode()).isEqualTo(200);
+        assertThat(response.responseBody()).isEqualTo("[{\"name\":\"ARTIFACT_IMAGE\",\"value\":\"localhost:5000/alpine:v1\"}]");
+    }
+
 
     @Test
     public void shouldErrorOutWhenDigestIsNotSame() {
@@ -86,7 +108,7 @@ public class FetchArtifactExecutorTest {
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, new FetchArtifactConfig());
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         when(dockerProgressHandler.getDigest()).thenReturn("bar");
@@ -103,7 +125,7 @@ public class FetchArtifactExecutorTest {
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
-        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata);
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, new FetchArtifactConfig());
 
         when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
         doThrow(new RuntimeException("Some error")).when(dockerClient).pull("localhost:5000/alpine:v1", dockerProgressHandler);

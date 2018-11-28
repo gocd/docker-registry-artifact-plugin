@@ -22,7 +22,7 @@ import com.thoughtworks.go.plugin.api.request.DefaultGoApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 
-import static cd.go.artifact.docker.registry.Constants.API_VERSION;
+import static cd.go.artifact.docker.registry.Constants.CONSOLE_LOG_PROCESSOR_API_VERSION;
 import static cd.go.artifact.docker.registry.Constants.PLUGIN_IDENTIFIER;
 import static cd.go.artifact.docker.registry.DockerRegistryArtifactPlugin.LOG;
 
@@ -43,7 +43,7 @@ public class ConsoleLogger {
     }
 
     private void sendLog(ConsoleLogMessage consoleLogMessage) {
-        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.SEND_CONSOLE_LOG, API_VERSION, PLUGIN_IDENTIFIER);
+        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.SEND_CONSOLE_LOG, CONSOLE_LOG_PROCESSOR_API_VERSION, PLUGIN_IDENTIFIER);
         request.setRequestBody(consoleLogMessage.toJSON());
 
         GoApiResponse response = accessor.submit(request);

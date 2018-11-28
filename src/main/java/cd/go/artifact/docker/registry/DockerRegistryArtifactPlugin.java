@@ -74,7 +74,7 @@ public class DockerRegistryArtifactPlugin implements GoPlugin {
                 case REQUEST_FETCH_ARTIFACT_VIEW:
                     return new GetFetchArtifactViewExecutor().execute();
                 case REQUEST_FETCH_ARTIFACT_VALIDATE:
-                    return new ValidateFetchArtifactConfigExecutor().execute();
+                    return new ValidateFetchArtifactConfigExecutor(request).execute();
                 case REQUEST_PUBLISH_ARTIFACT:
                     return new PublishArtifactExecutor(request, consoleLogger).execute();
                 case REQUEST_FETCH_ARTIFACT:

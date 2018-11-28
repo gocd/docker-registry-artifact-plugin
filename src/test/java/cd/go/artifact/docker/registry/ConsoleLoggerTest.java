@@ -50,7 +50,7 @@ public class ConsoleLoggerTest {
 
         final GoApiRequest request = argumentCaptor.getValue();
         assertThat(request.api()).isEqualTo(Constants.SEND_CONSOLE_LOG);
-        assertThat(request.apiVersion()).isEqualTo(Constants.API_VERSION);
+        assertThat(request.apiVersion()).isEqualTo(Constants.CONSOLE_LOG_PROCESSOR_API_VERSION);
 
         final String expectedJSON = "{\n" +
                 "  \"logLevel\": \"INFO\",\n" +
@@ -66,7 +66,7 @@ public class ConsoleLoggerTest {
 
         final GoApiRequest request = argumentCaptor.getValue();
         assertThat(request.api()).isEqualTo(Constants.SEND_CONSOLE_LOG);
-        assertThat(request.apiVersion()).isEqualTo(Constants.API_VERSION);
+        assertThat(request.apiVersion()).isEqualTo(Constants.CONSOLE_LOG_PROCESSOR_API_VERSION);
 
         final String expectedJSON = "{\n" +
                 "  \"logLevel\": \"ERROR\",\n" +
