@@ -71,7 +71,7 @@ public class FetchArtifactExecutorTest {
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
 
-        FetchArtifactConfig fetchArtifactConfig = new FetchArtifactConfig("PREFIX");
+        FetchArtifactConfig fetchArtifactConfig = new FetchArtifactConfig("PREFIX", null);
 
         final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, fetchArtifactConfig);
 
