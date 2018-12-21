@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class FetchArtifactExecutorTest {
@@ -82,6 +84,31 @@ public class FetchArtifactExecutorTest {
 
         assertThat(response.responseCode()).isEqualTo(200);
         assertThat(response.responseBody()).isEqualTo("[{\"name\":\"PREFIX_ARTIFACT_IMAGE\",\"value\":\"localhost:5000/alpine:v1\"}]");
+    }
+
+    @Test
+    public void shouldNotFetchArtifactWhenSkipImagePullingIsToggled() {
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final HashMap<String, String> artifactMetadata = new HashMap<>();
+        artifactMetadata.put("image", "localhost:5000/alpine:v1");
+        artifactMetadata.put("digest", "foo");
+
+        FetchArtifactConfig fetchArtifactConfig = new FetchArtifactConfig("", "on");
+
+        final FetchArtifactRequest fetchArtifactRequest = new FetchArtifactRequest(storeConfig, artifactMetadata, fetchArtifactConfig);
+
+        when(request.requestBody()).thenReturn(new Gson().toJson(fetchArtifactRequest));
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
+
+        final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+
+        try {
+            verify(dockerClient, times(0)).pull("localhost:5000/alpine:v1", dockerProgressHandler);
+        } catch (DockerException | InterruptedException e) {
+            /* Should never happen */
+        }
+
+        assertThat(response.responseCode()).isEqualTo(200);
     }
 
     @Test
