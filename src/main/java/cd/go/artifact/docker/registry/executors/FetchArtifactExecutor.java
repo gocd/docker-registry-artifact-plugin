@@ -62,19 +62,25 @@ public class FetchArtifactExecutor implements RequestExecutor {
             FetchArtifactConfig fetchArtifactConfig = fetchArtifactRequest.getFetchArtifactConfig();
 
             final String artifactPrefix = fetchArtifactConfig.getEnvironmentVariablePrefix();
+            final String skipImagePulling = fetchArtifactConfig.getSkipImagePulling();
             final String imageToPull = artifactMap.get("image");
 
-            consoleLogger.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
-            LOG.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+            if (StringUtils.equals(skipImagePulling, "on")) {
+                consoleLogger.info(String.format("Not pulling docker image `%s` due to `Skip Image Pulling` configuration being set.", imageToPull));
+                LOG.info(String.format("Not pulling docker image `%s` due to `Skip Image Pulling` configuration being set.", imageToPull));
+            } else {
+                consoleLogger.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+                LOG.info(String.format("Pulling docker image `%s` from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
-            DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
-            docker.pull(imageToPull, dockerProgressHandler);
-            docker.close();
+                DockerClient docker = clientFactory.docker(fetchArtifactRequest.getArtifactStoreConfig());
+                docker.pull(imageToPull, dockerProgressHandler);
+                docker.close();
 
-            consoleLogger.info(String.format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
+                consoleLogger.info(String.format("Image `%s` successfully pulled from docker registry `%s`.", imageToPull, fetchArtifactRequest.getArtifactStoreConfig().getRegistryUrl()));
 
-            if (!dockerProgressHandler.getDigest().equals(artifactMap.get("digest"))) {
-                throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
+                if (!dockerProgressHandler.getDigest().equals(artifactMap.get("digest"))) {
+                    throw new RuntimeException(format("Expecting pulled image digest to be [%s] but it is [%s].", artifactMap.get("digest"), dockerProgressHandler.getDigest()));
+                }
             }
 
             JsonObject jsonObject = new JsonObject();
