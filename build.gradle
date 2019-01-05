@@ -37,7 +37,7 @@ project.ext.pluginDesc = [
         name       : 'Artifact plugin for docker',
         description: 'Plugin allows to push/pull docker image from public or private docker registry',
         vendorName : 'GoCD Contributors',
-        vendorUrl  : 'https://github.com/gocd/docker-artifact-plugin'
+        vendorUrl  : 'https://github.com/gocd/docker-registry-artifact-plugin'
 ]
 
 repositories {
