@@ -35,6 +35,7 @@ public class PublishArtifactRequestTest {
                 "  \"artifact_store\": {\n" +
                 "    \"configuration\": {\n" +
                 "      \"RegistryURL\": \"public-registry-url\",\n" +
+                "      \"RegistryType\": \"other\",\n" +
                 "      \"Username\": \"username\",\n" +
                 "      \"Password\": \"password\"\n" +
                 "    },\n" +

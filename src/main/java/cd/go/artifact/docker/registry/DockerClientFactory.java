@@ -17,6 +17,7 @@
 package cd.go.artifact.docker.registry;
 
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
+import com.amazonaws.services.ecr.AmazonECRClient;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
@@ -37,7 +38,7 @@ public class DockerClientFactory {
     }
 
     private static DefaultDockerClient createClient(ArtifactStoreConfig artifactStoreConfig) throws DockerCertificateException, DockerException, InterruptedException {
-        final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig);
+        final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig, AmazonECRClient.builder());
         DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuthSupplier(registryAuthSupplier).build();
 
         LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getRegistryUrl()));

@@ -16,7 +16,6 @@
 
 package cd.go.artifact.docker.registry.executors;
 
-import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.json.JSONException;
@@ -51,21 +50,18 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
                 "    \"message\": \"RegistryURL must not be blank.\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Password\",\n" +
-                "    \"message\": \"Password must not be blank.\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"key\": \"Username\",\n" +
-                "    \"message\": \"Username must not be blank.\"\n" +
+                "    \"key\": \"RegistryType\",\n" +
+                "    \"message\": \"RegistryType must not be blank.\"\n" +
                 "  }\n" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
-    public void shouldValidateProperData() throws JSONException {
+    public void shouldValidateProperDataIfTypeIsOther() throws JSONException {
         String requestBody = new JSONObject()
                 .put("RegistryURL", "http://localhost/index")
+                .put("RegistryType", "other")
                 .put("Username", "chuck-norris")
                 .put("Password", "chuck-norris-doesnt-need-passwords")
                 .toString();
@@ -73,6 +69,88 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
 
         final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
         String expectedJSON = "[]";
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidateProperDataIfTypeIsEcr() throws JSONException {
+        String requestBody = new JSONObject()
+                .put("RegistryURL", "http://localhost/index")
+                .put("RegistryType", "ecr")
+                .put("AWSAccessKeyId", "chuck-norris-aws-access-key-id")
+                .put("AWSSecretAccessKey", "chuck-norris-aws-secret-access-key")
+                .put("AWSRegion", "us-west-1")
+                .toString();
+        when(request.requestBody()).thenReturn(requestBody);
+
+        final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
+        String expectedJSON = "[]";
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidateRegistryType() throws JSONException {
+        String requestBody = new JSONObject()
+                .put("RegistryURL", "http://localhost/index")
+                .put("RegistryType", "foo")
+                .toString();
+        when(request.requestBody()).thenReturn(requestBody);
+
+        final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
+        String expectedJSON = "[\n" +
+                "  {\n" +
+                "    \"key\": \"RegistryType\",\n" +
+                "    \"message\": \"RegistryType must either be `ecr` or `other`.\"\n" +
+                "  }\n" +
+                "]";
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidatePresenceOfUsernameAndPasswordIfTypeIsOther() throws JSONException {
+        String requestBody = new JSONObject()
+                .put("RegistryURL", "http://localhost/index")
+                .put("RegistryType", "other")
+                .toString();
+        when(request.requestBody()).thenReturn(requestBody);
+
+        final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
+        String expectedJSON = "[\n" +
+                "  {\n" +
+                "    \"key\": \"Username\",\n" +
+                "    \"message\": \"Username must not be blank.\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"Password\",\n" +
+                "    \"message\": \"Password must not be blank.\"\n" +
+                "  }\n" +
+                "]";
+        JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidatePresenceOfAwsKeysIfTypeIsEcr() throws JSONException {
+        String requestBody = new JSONObject()
+                .put("RegistryURL", "http://localhost/index")
+                .put("RegistryType", "ecr")
+                .toString();
+        when(request.requestBody()).thenReturn(requestBody);
+
+        final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
+        String expectedJSON = "[\n" +
+                "  {\n" +
+                "    \"key\": \"AWSAccessKeyId\",\n" +
+                "    \"message\": \"AWSAccessKeyId must not be blank.\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"AWSSecretAccessKey\",\n" +
+                "    \"message\": \"AWSSecretAccessKey must not be blank.\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"AWSRegion\",\n" +
+                "    \"message\": \"AWSRegion must not be blank.\"\n" +
+                "  }\n" +
+                "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);
     }
 }

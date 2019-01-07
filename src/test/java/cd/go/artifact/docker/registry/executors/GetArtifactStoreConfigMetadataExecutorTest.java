@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GetArtifactStoreConfigMetadataExecutorTest {
     @Test
-    public void shouldReturnFetchArtifactMetadata() throws JSONException {
+    public void shouldReturnArtifactStoreMetadata() throws JSONException {
         final GoPluginApiResponse response = new GetArtifactStoreConfigMetadataExecutor().execute();
 
         final String expectedJSON = "[\n" +
@@ -37,16 +37,44 @@ public class GetArtifactStoreConfigMetadataExecutorTest {
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"Username\",\n" +
+                "    \"key\": \"RegistryType\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
+                "    \"key\": \"AWSAccessKeyId\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": true\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"AWSSecretAccessKey\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": true\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"AWSRegion\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": false\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"Username\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": false\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
                 "    \"key\": \"Password\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": true\n" +
                 "    }\n" +
                 "  }\n" +
