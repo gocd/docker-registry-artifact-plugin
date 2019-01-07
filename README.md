@@ -31,9 +31,29 @@ There are three levels of configuration needed in order for publishing and fetch
    - Specify the store id
    - Choose the docker registry artifact plugin
    - Specify the `Docker Registry Url`
-   - Specify `username` and `password`
+   - Specify the `Registry Type`
+   - Specify registry details
 
-   ![](images/artifact_store.png)
+   If `Registry Type` is `ecr`:
+
+   ![](images/artifact_store_ecr.png)
+
+   If `Registry Type` is `other`:
+
+   ![](images/artifact_store_other.png)
+
+###### Artifact Store Properties
+
+| Properties                     | Description                                                              | Required                  |
+| -------------------------------| ------------------------------------------------------------------------ | --------------------------|
+| `RegistryURL`                  | Registry to push and pull images                                         | `true`                    |
+| `RegistryType`                 | Can be either `ecr` or `other`                                           | `true`                    |
+| `Username`                     | The size of the PVC                                                      | `true` if type is `other` |
+| `Password`                     | The PVC storage class name                                               | `true` if type is `other` |
+| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `true` if type is `ecr`   |
+| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `true` if type is `ecr`   |
+| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `true` if type is `ecr`   |
+
 
 #### Publish artifact config
 
