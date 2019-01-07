@@ -80,7 +80,7 @@ public class PublishArtifactExecutorTest {
     @Test
     public void shouldPublishArtifactUsingBuildFile() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
         final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
 
@@ -100,7 +100,7 @@ public class PublishArtifactExecutorTest {
     @Test
     public void shouldPublishArtifactUsingImageAndTag() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "alpine", Optional.of("3.6"));
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
         final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
 
@@ -117,7 +117,7 @@ public class PublishArtifactExecutorTest {
     @Test
     public void shouldAddErrorToPublishArtifactResponseWhenFailedToPublishImage() throws IOException, DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
-        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), artifactStoreConfig);
         final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
         final ArgumentCaptor<DockerProgressHandler> argumentCaptor = ArgumentCaptor.forClass(DockerProgressHandler.class);

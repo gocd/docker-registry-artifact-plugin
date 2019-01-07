@@ -43,7 +43,7 @@ public class RegistryAuthSupplierChainTest {
 
     @Test
     public void shouldBuildRegistryAuthSupplierFromArtifactStoreConfigIfTypeIsOther() {
-        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("registry-url", "username", "password");
+        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("registry-url", "other", "username", "password");
 
         final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, AmazonECRClient.builder());
 

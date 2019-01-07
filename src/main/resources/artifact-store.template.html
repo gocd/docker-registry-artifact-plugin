@@ -7,7 +7,7 @@
 <div class="form_item_block">
     <label>Registry Type:<span class='asterix'>*</span></label>
     <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryType].$error.server}" type="radio" ng-model="RegistryType" value="ecr"/>
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryType].$error.server}">ECR</label>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryType].$error.server}">Amazon ECR</label>
 
     <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryType].$error.server}" type="radio" ng-model="RegistryType" value="other" />
     <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryType].$error.server}">Others (Dockerhub, GCR, private)</label>

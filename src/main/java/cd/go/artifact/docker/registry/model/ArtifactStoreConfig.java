@@ -63,16 +63,19 @@ public class ArtifactStoreConfig implements Validatable {
     public ArtifactStoreConfig() {
     }
 
-    public ArtifactStoreConfig(String registryUrl,String username, String password) {
+    public ArtifactStoreConfig(String registryUrl, String registryType) {
         this.registryUrl = registryUrl;
+        this.registryType = registryType;
+    }
+
+    public ArtifactStoreConfig(String registryUrl, String registryType, String username, String password) {
+        this(registryUrl, registryType);
         this.username = username;
         this.password = password;
-        this.registryType = "other";
     }
 
     public ArtifactStoreConfig(String registryUrl, String registryType, String awsAccessKeyId, String awsSecretAccessKey, String awsRegion) {
-        this.registryUrl = registryUrl;
-        this.registryType = registryType;
+        this(registryUrl, registryType);
         this.awsAccessKeyId = awsAccessKeyId;
         this.awsSecretAccessKey = awsSecretAccessKey;
         this.awsRegion = awsRegion;

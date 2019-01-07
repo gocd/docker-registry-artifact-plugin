@@ -44,15 +44,25 @@ There are three levels of configuration needed in order for publishing and fetch
 
 ###### Artifact Store Properties
 
-| Properties                     | Description                                                              | Required                  |
-| -------------------------------| ------------------------------------------------------------------------ | --------------------------|
-| `RegistryURL`                  | Registry to push and pull images                                         | `true`                    |
-| `RegistryType`                 | Can be either `ecr` or `other`                                           | `true`                    |
-| `Username`                     | The size of the PVC                                                      | `true` if type is `other` |
-| `Password`                     | The PVC storage class name                                               | `true` if type is `other` |
-| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `true` if type is `ecr`   |
-| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `true` if type is `ecr`   |
-| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `true` if type is `ecr`   |
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `RegistryURL`                  | Registry to push and pull images                                         | `yes`                    |
+| `RegistryType`                 | Can be either `ecr` or `other`                                           | `yes`                    |
+
+If `RegistryType` is `ecr`:
+
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `yes`                    |
+| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `yes`                    |
+| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `yes`                    |
+
+If `RegistryType` is `other`
+
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `Username`                     | Username to authenticate with the docker registry.                       | `yes`                    |
+| `Password`                     | Password to authenticate with the docker registry.                       | `yes`                    |
 
 
 #### Publish artifact config
