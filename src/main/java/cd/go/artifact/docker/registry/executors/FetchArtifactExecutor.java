@@ -62,10 +62,10 @@ public class FetchArtifactExecutor implements RequestExecutor {
             FetchArtifactConfig fetchArtifactConfig = fetchArtifactRequest.getFetchArtifactConfig();
 
             final String artifactPrefix = fetchArtifactConfig.getEnvironmentVariablePrefix();
-            final String skipImagePulling = fetchArtifactConfig.getSkipImagePulling();
+            final boolean skipImagePulling = fetchArtifactConfig.getSkipImagePulling();
             final String imageToPull = artifactMap.get("image");
 
-            if (StringUtils.equals(skipImagePulling, "on")) {
+            if (skipImagePulling) {
                 consoleLogger.info(String.format("Not pulling docker image `%s` due to `Skip Image Pulling` configuration being set.", imageToPull));
                 LOG.info(String.format("Not pulling docker image `%s` due to `Skip Image Pulling` configuration being set.", imageToPull));
             } else {
