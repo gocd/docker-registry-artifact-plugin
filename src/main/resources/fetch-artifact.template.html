@@ -4,7 +4,8 @@
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[EnvironmentVariablePrefix].$error.server}" ng-show="GOINPUTNAME[EnvironmentVariablePrefix].$error.server">{{GOINPUTNAME[EnvironmentVariablePrefix].$error.server}}</span>
 </div>
 <div class="form_item_block">
-    <input id="SkipImagePullingInput" ng-class="{'is-invalid-input': GOINPUTNAME[SkipImagePulling].$error.server}" type="checkbox" ng-model="SkipImagePulling"/>
+    <input id="SkipImagePullingInput" ng-class="{'is-invalid-input': GOINPUTNAME[SkipImagePulling].$error.server}" type="checkbox"
+           value="{{SkipImagePulling}}" ng-model="SkipImagePulling" ng-true-value="true" ng-false-value="false"/>
     <label for="SkipImagePullingInput" ng-class="{'is-invalid-label': GOINPUTNAME[SkipImagePulling].$error.server}">Skip Image Pulling</label>
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[SkipImagePulling].$error.server}" ng-show="GOINPUTNAME[SkipImagePulling].$error.server">{{GOINPUTNAME[SkipImagePulling].$error.server}}</span>
 </div>
