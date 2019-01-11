@@ -58,6 +58,8 @@ To pull an image from an upstream pipeline or stage, the following information i
    - Specify the pipeline, stage and job name.
    - Specify the artifact id of the external artifact that belongs to the upstream job
 
+   ![](images/fetch_artifact_task.png)
+
 ## License
 
 ```plain
