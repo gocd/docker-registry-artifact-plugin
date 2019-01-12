@@ -31,11 +31,17 @@ public class FetchArtifactConfig implements Validatable {
     @FieldMetadata(key = "EnvironmentVariablePrefix", required = false)
     private String environmentVariablePrefix;
 
+    @Expose
+    @SerializedName("SkipImagePulling")
+    @FieldMetadata(key = "SkipImagePulling")
+    private boolean skipImagePulling;
+
     public FetchArtifactConfig() {
     }
 
-    public FetchArtifactConfig(String environmentVariablePrefix) {
+    public FetchArtifactConfig(String environmentVariablePrefix, String skipImagePulling) {
         this.environmentVariablePrefix = environmentVariablePrefix;
+        this.skipImagePulling = Boolean.parseBoolean(skipImagePulling);
     }
 
     public static FetchArtifactConfig fromJSON(String json) {
@@ -44,6 +50,10 @@ public class FetchArtifactConfig implements Validatable {
 
     public String getEnvironmentVariablePrefix() {
         return environmentVariablePrefix;
+    }
+
+    public boolean getSkipImagePulling() {
+        return skipImagePulling;
     }
 
     @Override
