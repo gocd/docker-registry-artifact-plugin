@@ -68,7 +68,7 @@ public class FetchArtifactExecutorTest {
 
     @Test
     public void shouldFetchArtifact() {
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
@@ -88,7 +88,7 @@ public class FetchArtifactExecutorTest {
 
     @Test
     public void shouldNotFetchArtifactWhenSkipImagePullingIsToggled() {
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
@@ -113,7 +113,7 @@ public class FetchArtifactExecutorTest {
 
     @Test
     public void shouldSetEnvironmentVariablesWithImageInformationInResponseRegardlessOfWhetherThePrefixIsProvided() {
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
@@ -131,7 +131,7 @@ public class FetchArtifactExecutorTest {
 
     @Test
     public void shouldErrorOutWhenDigestIsNotSame() {
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");
@@ -148,7 +148,7 @@ public class FetchArtifactExecutorTest {
 
     @Test
     public void shouldErrorOutWhenFailedToPull() throws DockerException, InterruptedException {
-        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "admin", "admin123");
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
         artifactMetadata.put("digest", "foo");

@@ -31,9 +31,39 @@ There are three levels of configuration needed in order for publishing and fetch
    - Specify the store id
    - Choose the docker registry artifact plugin
    - Specify the `Docker Registry Url`
-   - Specify `username` and `password`
+   - Specify the `Registry Type`
+   - Specify registry details
 
-   ![](images/artifact_store.png)
+   If `Registry Type` is `ecr`:
+
+   ![](images/artifact_store_ecr.png)
+
+   If `Registry Type` is `other`:
+
+   ![](images/artifact_store_other.png)
+
+###### Artifact Store Properties
+
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `RegistryURL`                  | Registry to push and pull images                                         | `yes`                    |
+| `RegistryType`                 | Can be either `ecr` or `other`                                           | `yes`                    |
+
+If `RegistryType` is `ecr`:
+
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `yes`                    |
+| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `yes`                    |
+| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `yes`                    |
+
+If `RegistryType` is `other`
+
+| Properties                     | Description                                                              | Mandatory                |
+| -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `Username`                     | Username to authenticate with the docker registry.                       | `yes`                    |
+| `Password`                     | Password to authenticate with the docker registry.                       | `yes`                    |
+
 
 #### Publish artifact config
 

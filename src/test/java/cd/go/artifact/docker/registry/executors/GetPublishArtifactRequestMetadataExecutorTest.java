@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GetPublishArtifactRequestMetadataExecutorTest {
     @Test
-    public void shouldReturnFetchArtifactMetadata() throws JSONException {
+    public void shouldReturnPublishArtifactMetadata() throws JSONException {
         final GoPluginApiResponse response = new GetPublishArtifactConfigMetadataExecutor().execute();
 
         final String expectedJSON = "[" +

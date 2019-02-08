@@ -16,23 +16,73 @@
 
 package cd.go.artifact.docker.registry;
 
-import cd.go.artifact.docker.registry.RegistryAuthSupplierChain;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
+import com.amazonaws.ClientConfigurationFactory;
+import com.amazonaws.client.AwsSyncClientParams;
+import com.amazonaws.client.builder.AwsSyncClientBuilder;
+import com.amazonaws.services.ecr.AmazonECR;
+import com.amazonaws.services.ecr.AmazonECRClient;
+import com.amazonaws.services.ecr.AmazonECRClientBuilder;
+import com.amazonaws.services.ecr.model.AuthorizationData;
+import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest;
+import com.amazonaws.services.ecr.model.GetAuthorizationTokenResult;
 import com.spotify.docker.client.messages.RegistryAuth;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RegistryAuthSupplierChainTest {
-    @Test
-    public void shouldBuildRegistryAuthSupplierFromArtifactStoreConfig() {
-        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("registry-url", "username", "password");
+    private AmazonECRClient mockAmazonEcrClient = mock(AmazonECRClient.class);
 
-        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig);
+    @Test
+    public void shouldBuildRegistryAuthSupplierFromArtifactStoreConfigIfTypeIsOther() {
+        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("registry-url", "other", "username", "password");
+
+        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, AmazonECRClient.builder());
 
         final RegistryAuth registryAuth = registryAuthSupplierChain.authFor("foo");
         assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getRegistryUrl());
         assertThat(registryAuth.username()).isEqualTo(artifactStoreConfig.getUsername());
         assertThat(registryAuth.password()).isEqualTo(artifactStoreConfig.getPassword());
+    }
+
+    @Test
+    public void shouldSetUsernameAndPasswordByMakingARequestToECRIfTypeIsEcr() {
+        GetAuthorizationTokenResult mockAuthorizationTokenResult = mock(GetAuthorizationTokenResult.class);
+        AuthorizationData mockAuthorization = mock(AuthorizationData.class);
+        List<AuthorizationData> authorizationData = new ArrayList<>();
+        authorizationData.add(mockAuthorization);
+        final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("https://12345.dkr.ecr.region.amazonaws.com", "ecr", "awsAccessKeyId", "awsSecretAccessKey", "awsRegion");
+
+        String usernameAndPassword="AWS:secretAuthorizationToken";
+        when(mockAmazonEcrClient.getAuthorizationToken(any(GetAuthorizationTokenRequest.class))).thenReturn(mockAuthorizationTokenResult);
+        when(mockAuthorizationTokenResult.getAuthorizationData()).thenReturn(authorizationData);
+        when(mockAuthorization.getAuthorizationToken()).thenReturn(Base64.getEncoder().encodeToString(usernameAndPassword.getBytes()));
+
+        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, new MockAwsECRClientBuilder(new ClientConfigurationFactory()));
+        final RegistryAuth registryAuth = registryAuthSupplierChain.authFor("foo");
+
+        assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getRegistryUrl());
+        assertThat(registryAuth.username()).isEqualTo("AWS");
+        assertThat(registryAuth.password()).isEqualTo("secretAuthorizationToken");
+    }
+
+    public class MockAwsECRClientBuilder extends AwsSyncClientBuilder<AmazonECRClientBuilder, AmazonECR> {
+
+        protected MockAwsECRClientBuilder(ClientConfigurationFactory clientConfigFactory) {
+            super(clientConfigFactory);
+        }
+
+        @Override
+        protected AmazonECR build(AwsSyncClientParams clientParams) {
+            return mockAmazonEcrClient;
+        }
     }
 }
