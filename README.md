@@ -53,9 +53,17 @@ If `RegistryType` is `ecr`:
 
 | Properties                     | Description                                                              | Mandatory                |
 | -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
-| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `yes`                    |
-| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `yes`                    |
+| `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `no`                    |
+| `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `no`                    |
 | `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `yes`                    |
+
+Note: If the AWSAccessKeyId and AWSSecretAccessKey are not provided, the following configurations are checked:
+
+- Environment Variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+- System Properties `aws.accessKeyId` and `aws.secretKey`
+- Credential profiles file at the default location (~/.aws/credentials)
+- Credentials delivered through the Amazon EC2 container service if AWS_CONTAINER_CREDENTIALS_RELATIVE_URI" environment variable is set and security manager has permission to access the variable
+- Instance profile credentials delivered through the Amazon EC2 metadata service
 
 If `RegistryType` is `other`
 

@@ -45,7 +45,7 @@ public class RegistryAuthSupplierChainTest {
     public void shouldBuildRegistryAuthSupplierFromArtifactStoreConfigIfTypeIsOther() {
         final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("registry-url", "other", "username", "password");
 
-        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, AmazonECRClient.builder());
+        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, new AWSTokenRequestGenerator());
 
         final RegistryAuth registryAuth = registryAuthSupplierChain.authFor("foo");
         assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getRegistryUrl());
@@ -66,7 +66,7 @@ public class RegistryAuthSupplierChainTest {
         when(mockAuthorizationTokenResult.getAuthorizationData()).thenReturn(authorizationData);
         when(mockAuthorization.getAuthorizationToken()).thenReturn(Base64.getEncoder().encodeToString(usernameAndPassword.getBytes()));
 
-        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, new MockAwsECRClientBuilder(new ClientConfigurationFactory()));
+        final RegistryAuthSupplierChain registryAuthSupplierChain = new RegistryAuthSupplierChain(artifactStoreConfig, new AWSTokenRequestGenerator(new MockAwsECRClientBuilder(new ClientConfigurationFactory())));
         final RegistryAuth registryAuth = registryAuthSupplierChain.authFor("foo");
 
         assertThat(registryAuth.serverAddress()).isEqualTo(artifactStoreConfig.getRegistryUrl());

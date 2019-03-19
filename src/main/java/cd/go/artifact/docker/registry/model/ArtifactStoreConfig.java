@@ -167,12 +167,6 @@ public class ArtifactStoreConfig implements Validatable {
             }
         }
         if ("ecr".equals(registryType)) {
-            if(StringUtils.isBlank(awsAccessKeyId)) {
-                validationResult.addError("AWSAccessKeyId", "AWSAccessKeyId must not be blank.");
-            }
-            if(StringUtils.isBlank(awsSecretAccessKey)) {
-                validationResult.addError("AWSSecretAccessKey", "AWSSecretAccessKey must not be blank.");
-            }
             if(StringUtils.isBlank(awsRegion)) {
                 validationResult.addError("AWSRegion", "AWSRegion must not be blank.");
             }

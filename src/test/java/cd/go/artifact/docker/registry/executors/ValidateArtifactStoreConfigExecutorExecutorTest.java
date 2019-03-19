@@ -129,7 +129,7 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
     }
 
     @Test
-    public void shouldValidatePresenceOfAwsKeysIfTypeIsEcr() throws JSONException {
+    public void shouldValidatePresenceOfAwsRegionIfTypeIsEcr() throws JSONException {
         String requestBody = new JSONObject()
                 .put("RegistryURL", "http://localhost/index")
                 .put("RegistryType", "ecr")
@@ -138,14 +138,6 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
 
         final GoPluginApiResponse response = new ValidateArtifactStoreConfigExecutor(request).execute();
         String expectedJSON = "[\n" +
-                "  {\n" +
-                "    \"key\": \"AWSAccessKeyId\",\n" +
-                "    \"message\": \"AWSAccessKeyId must not be blank.\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"key\": \"AWSSecretAccessKey\",\n" +
-                "    \"message\": \"AWSSecretAccessKey must not be blank.\"\n" +
-                "  },\n" +
                 "  {\n" +
                 "    \"key\": \"AWSRegion\",\n" +
                 "    \"message\": \"AWSRegion must not be blank.\"\n" +

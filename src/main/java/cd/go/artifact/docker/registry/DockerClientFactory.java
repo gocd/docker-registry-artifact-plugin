@@ -38,7 +38,7 @@ public class DockerClientFactory {
     }
 
     private static DefaultDockerClient createClient(ArtifactStoreConfig artifactStoreConfig) throws DockerCertificateException, DockerException, InterruptedException {
-        final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig, AmazonECRClient.builder());
+        final RegistryAuthSupplierChain registryAuthSupplier = new RegistryAuthSupplierChain(artifactStoreConfig, new AWSTokenRequestGenerator());
         DefaultDockerClient docker = DefaultDockerClient.fromEnv().registryAuthSupplier(registryAuthSupplier).build();
 
         LOG.info(format("Using docker registry server `{0}`.", artifactStoreConfig.getRegistryUrl()));

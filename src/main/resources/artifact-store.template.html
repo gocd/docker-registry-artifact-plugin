@@ -16,21 +16,21 @@
 
 <div ng-show="RegistryType == 'ecr'">
     <div class="form_item_block">
-        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSAccessKeyId].$error.server}">AWS Access Key Id:<span class='asterix'>*</span></label>
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSRegion].$error.server}">AWS Region:<span class='asterix'>*</span></label>
+        <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSRegion].$error.server}" type="text" ng-model="AWSRegion" ng-required="true" placeholder="value"/>
+        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSRegion].$error.server}" ng-show="GOINPUTNAME[AWSRegion].$error.server">{{GOINPUTNAME[AWSRegion].$error.server}}</span>
+    </div>
+
+    <div class="form_item_block">
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSAccessKeyId].$error.server}">AWS Access Key Id:</label>
         <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSAccessKeyId].$error.server}" type="password" ng-model="AWSAccessKeyId" ng-required="true" placeholder="value"/>
         <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSAccessKeyId].$error.server}" ng-show="GOINPUTNAME[AWSAccessKeyId].$error.server">{{GOINPUTNAME[AWSAccessKeyId].$error.server}}</span>
     </div>
 
     <div class="form_item_block">
-        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSSecretAccessKey].$error.server}">AWS Secret Access Key:<span class='asterix'>*</span></label>
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSSecretAccessKey].$error.server}">AWS Secret Access Key:</label>
         <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSSecretAccessKey].$error.server}" type="password" ng-model="AWSSecretAccessKey" ng-required="true" placeholder="value"/>
         <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSSecretAccessKey].$error.server}" ng-show="GOINPUTNAME[AWSSecretAccessKey].$error.server">{{GOINPUTNAME[AWSSecretAccessKey].$error.server}}</span>
-    </div>
-
-    <div class="form_item_block">
-        <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSRegion].$error.server}">AWS Region:<span class='asterix'>*</span></label>
-        <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSRegion].$error.server}" type="text" ng-model="AWSRegion" ng-required="true" placeholder="value"/>
-        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[AWSRegion].$error.server}" ng-show="GOINPUTNAME[AWSRegion].$error.server">{{GOINPUTNAME[AWSRegion].$error.server}}</span>
     </div>
 </div>
 
