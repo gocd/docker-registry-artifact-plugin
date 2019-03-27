@@ -14,31 +14,34 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'co.riiid.gradle' version '0.4.2'
-}
-
 apply plugin: 'java'
-apply from: 'plugin-helpers.gradle'
+apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 
+gocdPlugin {
+  id = 'cd.go.artifact.docker.registry'
+  pluginVersion = '1.0.0'
+  goCdVersion = '18.7.0'
+  name = 'Artifact plugin for docker'
+  description = 'Plugin allows to push/pull docker image from public or private docker registry'
+  vendorName = 'ThoughtWorks, Inc.'
+  vendorUrl = 'https://github.com/gocd/docker-registry-artifact-plugin'
+
+  githubRepo {
+    owner = System.getenv('GITHUB_USER') ?: 'bob'
+    repo = 'docker-registry-artifact-plugin'
+    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+  }
+
+  pluginProject = project
+
+  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+  assetsToRelease = [project.tasks.findByName('jar')]
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-project.ext.pluginVersion = '1.0.0'
-project.ext.fullVersion = project.git.distVersion() ? "${project.pluginVersion}-${project.git.distVersion()}" : project.pluginVersion
-
-version = project.fullVersion
-project.ext.pluginDesc = [
-        id         : 'cd.go.artifact.docker.registry',
-        repo       : rootProject.name,
-        version    : project.version,
-        goCdVersion: '18.7.0',
-        name       : 'Artifact plugin for docker',
-        description: 'Plugin allows to push/pull docker image from public or private docker registry',
-        vendorName : 'GoCD Contributors',
-        vendorUrl  : 'https://github.com/gocd/docker-registry-artifact-plugin'
-]
+version = gocdPlugin.fullVersion(project)
 
 repositories {
     mavenCentral()
@@ -82,4 +85,3 @@ jar {
 //        into "/"
 //    }
 }
-apply from: 'plugin-tasks.gradle'

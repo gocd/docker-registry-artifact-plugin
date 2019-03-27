@@ -14,3 +14,4 @@ build/
 !gradle-wrapper.jar
 out
 docker-registry-artifact-plugin.iml
+src/main/resources-generated/
