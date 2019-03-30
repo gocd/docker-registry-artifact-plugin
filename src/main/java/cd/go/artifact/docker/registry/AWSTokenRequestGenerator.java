@@ -26,12 +26,14 @@ import com.amazonaws.services.ecr.AmazonECRClient;
 import com.amazonaws.services.ecr.AmazonECRClientBuilder;
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest;
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenResult;
+import com.thoughtworks.go.plugin.api.logging.Logger;
 
 import java.util.Base64;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class AWSTokenRequestGenerator {
+    public static final Logger LOG = Logger.getLoggerFor(AWSTokenRequestGenerator.class);
     private AwsSyncClientBuilder<AmazonECRClientBuilder, AmazonECR> builder;
 
     AWSTokenRequestGenerator() {
@@ -58,9 +60,11 @@ public class AWSTokenRequestGenerator {
         if (isNotBlank(artifactStoreConfig.getAwsAccessKeyId()) || isNotBlank(artifactStoreConfig.getAwsSecretAccessKey())) {
             AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(artifactStoreConfig.getAwsAccessKeyId(), artifactStoreConfig.getAwsSecretAccessKey()));
             builder.setCredentials(awsStaticCredentialsProvider);
+            LOG.debug("Using the AWS keys configured in the specified artifact store.");
         }
         else {
             builder.setCredentials(new DefaultAWSCredentialsProviderChain());
+            LOG.debug("Setting the default aws credentials chain provider. This happens if the specified artifact store does not have aws keys configured. The default chain checks for environment variables, system properties, credentials profile, instance profile.");
         }
     }
 

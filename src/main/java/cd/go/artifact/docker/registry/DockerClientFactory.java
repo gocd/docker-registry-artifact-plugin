@@ -17,7 +17,6 @@
 package cd.go.artifact.docker.registry;
 
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
-import com.amazonaws.services.ecr.AmazonECRClient;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
