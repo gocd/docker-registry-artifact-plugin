@@ -1,10 +1,4 @@
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryURL].$error.server}">Docker Registry Url:<span class='asterix'>*</span></label>
-    <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryURL].$error.server}" type="text" ng-model="RegistryURL" ng-required="true" placeholder="value"/>
-    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[RegistryURL].$error.server}" ng-show="GOINPUTNAME[RegistryURL].$error.server">{{GOINPUTNAME[RegistryURL].$error.server}}</span>
-</div>
-
-<div class="form_item_block">
+<div class="form_item_block" ng-init="RegistryType = 'ecr'">
     <label>Registry Type:<span class='asterix'>*</span></label>
     <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryType].$error.server}" type="radio" ng-model="RegistryType" value="ecr"/>
     <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryType].$error.server}">Amazon ECR</label>
@@ -15,6 +9,12 @@
 </div>
 
 <div ng-show="RegistryType == 'ecr'">
+    <div class="form_item_block">
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryID].$error.server}">ECR Registry ID:<span class='asterix'>*</span></label>
+        <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryID].$error.server}" type="text" ng-model="RegistryID" ng-required="true" placeholder="value"/>
+        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[RegistryID].$error.server}" ng-show="GOINPUTNAME[RegistryID].$error.server">{{GOINPUTNAME[RegistryID].$error.server}}</span>
+    </div>
+
     <div class="form_item_block">
         <label ng-class="{'is-invalid-label': GOINPUTNAME[AWSRegion].$error.server}">AWS Region:<span class='asterix'>*</span></label>
         <input ng-class="{'is-invalid-input': GOINPUTNAME[AWSRegion].$error.server}" type="text" ng-model="AWSRegion" ng-required="true" placeholder="value"/>
@@ -35,6 +35,13 @@
 </div>
 
 <div ng-show="RegistryType == 'other'">
+
+    <div class="form_item_block">
+        <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryURL].$error.server}">Docker Registry Url:<span class='asterix'>*</span></label>
+        <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryURL].$error.server}" type="text" ng-model="RegistryURL" ng-required="true" placeholder="value"/>
+        <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[RegistryURL].$error.server}" ng-show="GOINPUTNAME[RegistryURL].$error.server">{{GOINPUTNAME[RegistryURL].$error.server}}</span>
+    </div>
+
     <div class="form_item_block">
         <label ng-class="{'is-invalid-label': GOINPUTNAME[Username].$error.server}">Username:<span class='asterix'>*</span></label>
         <input ng-class="{'is-invalid-input': GOINPUTNAME[Username].$error.server}" type="text" ng-model="Username" ng-required="true" placeholder="value"/>

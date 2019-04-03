@@ -26,14 +26,19 @@ import org.apache.commons.lang.StringUtils;
 
 public class ArtifactStoreConfig implements Validatable {
     @Expose
-    @SerializedName("RegistryURL")
-    @FieldMetadata(key = "RegistryURL", required = true)
-    private String registryUrl;
-
-    @Expose
     @SerializedName("RegistryType")
     @FieldMetadata(key = "RegistryType", required = true)
     private String registryType;
+
+    @Expose
+    @SerializedName("RegistryURL")
+    @FieldMetadata(key = "RegistryURL", required = false)
+    private String registryUrl;
+
+    @Expose
+    @SerializedName("RegistryID")
+    @FieldMetadata(key = "RegistryID", required = false)
+    private String registryId;
 
     @Expose
     @SerializedName("AWSAccessKeyId")
@@ -63,19 +68,20 @@ public class ArtifactStoreConfig implements Validatable {
     public ArtifactStoreConfig() {
     }
 
-    public ArtifactStoreConfig(String registryUrl, String registryType) {
-        this.registryUrl = registryUrl;
+    public ArtifactStoreConfig(String registryType) {
         this.registryType = registryType;
     }
 
     public ArtifactStoreConfig(String registryUrl, String registryType, String username, String password) {
-        this(registryUrl, registryType);
+        this(registryType);
+        this.registryUrl = registryUrl;
         this.username = username;
         this.password = password;
     }
 
-    public ArtifactStoreConfig(String registryUrl, String registryType, String awsAccessKeyId, String awsSecretAccessKey, String awsRegion) {
-        this(registryUrl, registryType);
+    public ArtifactStoreConfig(String registryId, String registryType, String awsAccessKeyId, String awsSecretAccessKey, String awsRegion) {
+        this(registryType);
+        this.registryId = registryId;
         this.awsAccessKeyId = awsAccessKeyId;
         this.awsSecretAccessKey = awsSecretAccessKey;
         this.awsRegion = awsRegion;
@@ -109,6 +115,10 @@ public class ArtifactStoreConfig implements Validatable {
         return awsRegion;
     }
 
+    public String getRegistryId() {
+        return registryId;
+    }
+
     public boolean isRegistryTypeEcr() {
         return "ecr".equals(registryType);
     }
@@ -126,6 +136,7 @@ public class ArtifactStoreConfig implements Validatable {
         if (awsAccessKeyId != null ? !awsAccessKeyId.equals(that.awsAccessKeyId) : that.awsAccessKeyId != null) return false;
         if (awsSecretAccessKey != null ? !awsSecretAccessKey.equals(that.awsSecretAccessKey) : that.awsSecretAccessKey != null) return false;
         if (awsRegion != null ? !awsRegion.equals(that.awsRegion) : that.awsRegion != null) return false;
+        if (registryId != null ? !registryId.equals(that.registryId) : that.registryId != null) return false;
         return password != null ? password.equals(that.password) : that.password == null;
     }
 
@@ -138,6 +149,7 @@ public class ArtifactStoreConfig implements Validatable {
         result = 31 * result + (awsAccessKeyId != null ? awsAccessKeyId.hashCode() : 0);
         result = 31 * result + (awsSecretAccessKey != null ? awsSecretAccessKey.hashCode() : 0);
         result = 31 * result + (awsRegion != null ? awsRegion.hashCode() : 0);
+        result = 31 * result + (registryId != null ? registryId.hashCode() : 0);
         return result;
     }
 
@@ -149,9 +161,6 @@ public class ArtifactStoreConfig implements Validatable {
     @Override
     public ValidationResult validate() {
         ValidationResult validationResult = new ValidationResult();
-        if (StringUtils.isBlank(registryUrl)) {
-            validationResult.addError("RegistryURL", "RegistryURL must not be blank.");
-        }
         if (StringUtils.isBlank(registryType)) {
             validationResult.addError("RegistryType", "RegistryType must not be blank.");
         }
@@ -165,10 +174,16 @@ public class ArtifactStoreConfig implements Validatable {
             if(StringUtils.isBlank(password)) {
                 validationResult.addError("Password", "Password must not be blank.");
             }
+            if (StringUtils.isBlank(registryUrl)) {
+                validationResult.addError("RegistryURL", "RegistryURL must not be blank.");
+            }
         }
         if ("ecr".equals(registryType)) {
             if(StringUtils.isBlank(awsRegion)) {
                 validationResult.addError("AWSRegion", "AWSRegion must not be blank.");
+            }
+            if (StringUtils.isBlank(registryId)) {
+                validationResult.addError("RegistryID", "RegistryID must not be blank.");
             }
         }
         return validationResult;

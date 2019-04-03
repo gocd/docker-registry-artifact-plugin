@@ -32,8 +32,8 @@ import java.util.Base64;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-public class AWSTokenRequestGenerator {
-    public static final Logger LOG = Logger.getLoggerFor(AWSTokenRequestGenerator.class);
+class AWSTokenRequestGenerator {
+    private static final Logger LOG = Logger.getLoggerFor(AWSTokenRequestGenerator.class);
     private AwsSyncClientBuilder<AmazonECRClientBuilder, AmazonECR> builder;
 
     AWSTokenRequestGenerator() {
@@ -51,7 +51,7 @@ public class AWSTokenRequestGenerator {
     String[] getUsernameAndPasswordFromECRToken(ArtifactStoreConfig artifactStoreConfig) {
         builder.setRegion(artifactStoreConfig.getAwsRegion());
         setCredentialsProvider(artifactStoreConfig);
-        GetAuthorizationTokenResult authorizationTokenResult = builder.build().getAuthorizationToken(new GetAuthorizationTokenRequest().withRegistryIds(getAwsAccountIdFromURL(artifactStoreConfig.getRegistryUrl())));
+        GetAuthorizationTokenResult authorizationTokenResult = builder.build().getAuthorizationToken(new GetAuthorizationTokenRequest().withRegistryIds(artifactStoreConfig.getRegistryId()));
         String authorizationToken = authorizationTokenResult.getAuthorizationData().get(0).getAuthorizationToken();
         return new String(Base64.getDecoder().decode(authorizationToken)).split(":");
     }
@@ -66,10 +66,6 @@ public class AWSTokenRequestGenerator {
             builder.setCredentials(new DefaultAWSCredentialsProviderChain());
             LOG.debug("Setting the default aws credentials chain provider. This happens if the specified artifact store does not have aws keys configured. The default chain checks for environment variables, system properties, credentials profile, instance profile.");
         }
-    }
-
-    private String getAwsAccountIdFromURL(String registryUrl) {
-        return registryUrl.split("//")[1].split("\\.")[0];
     }
 
 }

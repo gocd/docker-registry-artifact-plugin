@@ -46,16 +46,16 @@ There are three levels of configuration needed in order for publishing and fetch
 
 | Properties                     | Description                                                              | Mandatory                |
 | -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
-| `RegistryURL`                  | Registry to push and pull images                                         | `yes`                    |
 | `RegistryType`                 | Can be either `ecr` or `other`                                           | `yes`                    |
 
 If `RegistryType` is `ecr`:
 
 | Properties                     | Description                                                              | Mandatory                |
 | -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `RegistryID`                   | ECR registry id to push and pull images                                  | `yes`                    |
+| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `yes`                    |
 | `AWSAccessKeyId`               | The aws access key id to execute ecr get authorization token request     | `no`                    |
 | `AWSSecretAccessKey`           | The aws secret access key to execute ecr get authorization token request | `no`                    |
-| `AWSRegion`                    | The aws region key to execute ecr get authorization token request        | `yes`                    |
 
 Note: If the AWSAccessKeyId and AWSSecretAccessKey are not provided, the following configurations are checked:
 
@@ -69,6 +69,7 @@ If `RegistryType` is `other`
 
 | Properties                     | Description                                                              | Mandatory                |
 | -------------------------------| ------------------------------------------------------------------------ | ------------------------ |
+| `RegistryURL`                  | Registry to push and pull images                                         | `yes`                    |
 | `Username`                     | Username to authenticate with the docker registry.                       | `yes`                    |
 | `Password`                     | Password to authenticate with the docker registry.                       | `yes`                    |
 

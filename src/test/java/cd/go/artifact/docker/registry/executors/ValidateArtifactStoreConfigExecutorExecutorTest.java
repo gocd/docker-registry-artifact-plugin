@@ -46,10 +46,6 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
 
         String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"key\": \"RegistryURL\",\n" +
-                "    \"message\": \"RegistryURL must not be blank.\"\n" +
-                "  },\n" +
-                "  {\n" +
                 "    \"key\": \"RegistryType\",\n" +
                 "    \"message\": \"RegistryType must not be blank.\"\n" +
                 "  }\n" +
@@ -75,7 +71,7 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
     @Test
     public void shouldValidateProperDataIfTypeIsEcr() throws JSONException {
         String requestBody = new JSONObject()
-                .put("RegistryURL", "http://localhost/index")
+                .put("RegistryID", "12345")
                 .put("RegistryType", "ecr")
                 .put("AWSAccessKeyId", "chuck-norris-aws-access-key-id")
                 .put("AWSSecretAccessKey", "chuck-norris-aws-secret-access-key")
@@ -131,7 +127,6 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
     @Test
     public void shouldValidatePresenceOfAwsRegionIfTypeIsEcr() throws JSONException {
         String requestBody = new JSONObject()
-                .put("RegistryURL", "http://localhost/index")
                 .put("RegistryType", "ecr")
                 .toString();
         when(request.requestBody()).thenReturn(requestBody);
@@ -141,6 +136,10 @@ public class ValidateArtifactStoreConfigExecutorExecutorTest {
                 "  {\n" +
                 "    \"key\": \"AWSRegion\",\n" +
                 "    \"message\": \"AWSRegion must not be blank.\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"RegistryID\",\n" +
+                "    \"message\": \"RegistryID must not be blank.\"\n" +
                 "  }\n" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), JSONCompareMode.NON_EXTENSIBLE);

@@ -76,7 +76,7 @@ public class RegistryAuthSupplierChainTest {
 
     public class MockAwsECRClientBuilder extends AwsSyncClientBuilder<AmazonECRClientBuilder, AmazonECR> {
 
-        protected MockAwsECRClientBuilder(ClientConfigurationFactory clientConfigFactory) {
+        MockAwsECRClientBuilder(ClientConfigurationFactory clientConfigFactory) {
             super(clientConfigFactory);
         }
 
