@@ -30,16 +30,23 @@ public class GetArtifactStoreConfigMetadataExecutorTest {
 
         final String expectedJSON = "[\n" +
                 "  {\n" +
-                "    \"key\": \"RegistryURL\",\n" +
+                "    \"key\": \"RegistryType\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"RegistryType\",\n" +
+                "    \"key\": \"RegistryURL\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": false\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"RegistryID\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
