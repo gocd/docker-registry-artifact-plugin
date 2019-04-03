@@ -1,4 +1,4 @@
-<div class="form_item_block" ng-init="RegistryType = 'ecr'">
+<div class="form_item_block" ng-init="RegistryType = (RegistryType || 'ecr')">
     <label>Registry Type:<span class='asterix'>*</span></label>
     <input ng-class="{'is-invalid-input': GOINPUTNAME[RegistryType].$error.server}" type="radio" ng-model="RegistryType" value="ecr"/>
     <label ng-class="{'is-invalid-label': GOINPUTNAME[RegistryType].$error.server}">Amazon ECR</label>
