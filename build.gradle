@@ -19,7 +19,7 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
   id = 'cd.go.artifact.docker.registry'
-  pluginVersion = '1.0.0'
+  pluginVersion = '1.0.1'
   goCdVersion = '18.7.0'
   name = 'Artifact plugin for docker'
   description = 'Plugin allows to push/pull docker image from public or private docker registry'
