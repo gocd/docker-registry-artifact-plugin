@@ -32,6 +32,7 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,12 +68,15 @@ public class PublishArtifactExecutorTest {
     private DefaultDockerClient dockerClient;
     @Mock
     private DockerClientFactory dockerClientFactory;
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private File agentWorkingDir;
 
     @Before
     public void setUp() throws IOException, InterruptedException, DockerException, DockerCertificateException {
         initMocks(this);
+        environmentVariables.clear();
         agentWorkingDir = tmpFolder.newFolder("go-agent");
 
         when(dockerClientFactory.docker(any())).thenReturn(dockerClient);
@@ -132,5 +137,40 @@ public class PublishArtifactExecutorTest {
 
         assertThat(response.responseCode()).isEqualTo(500);
         assertThat(response.responseBody()).contains("Failed to publish Artifact[id=id, storeId=storeId, artifactPlanConfig={\"BuildFile\":\"build.json\"}]: Some error");
+    }
+
+    @Test
+    public void shouldReadEnvironmentVariablesPassedFromServer() throws IOException, DockerException, InterruptedException {
+        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "${IMAGE_NAME}", Optional.of("3.6"));
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
+        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath(), Collections.singletonMap("IMAGE_NAME", "alpine"));
+
+        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
+
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+
+        verify(dockerClient).push(eq("alpine:3.6"), any(ProgressHandler.class));
+        assertThat(response.responseCode()).isEqualTo(200);
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"alpine:3.6\",\"digest\":\"foo\"}}");
+    }
+
+    @Test
+    public void shouldReadEnvironmentVariablesFromTheSystem() throws IOException, DockerException, InterruptedException {
+        environmentVariables.set("IMAGE_NAME", "alpine");
+        final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "${IMAGE_NAME}", Optional.of("3.6"));
+        final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
+        final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+
+        when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
+        when(dockerProgressHandler.getDigest()).thenReturn("foo");
+
+        final GoPluginApiResponse response = new PublishArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
+
+        verify(dockerClient).push(eq("alpine:3.6"), any(ProgressHandler.class));
+        assertThat(response.responseCode()).isEqualTo(200);
+        assertThat(response.responseBody()).isEqualTo("{\"metadata\":{\"image\":\"alpine:3.6\",\"digest\":\"foo\"}}");
     }
 }
