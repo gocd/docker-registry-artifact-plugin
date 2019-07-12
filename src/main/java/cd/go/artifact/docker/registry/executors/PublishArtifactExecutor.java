@@ -25,6 +25,9 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static cd.go.artifact.docker.registry.DockerRegistryArtifactPlugin.LOG;
 import static java.lang.String.format;
 
@@ -53,8 +56,9 @@ public class PublishArtifactExecutor implements RequestExecutor {
         final ArtifactStoreConfig artifactStoreConfig = publishArtifactRequest.getArtifactStore().getArtifactStoreConfig();
         try {
             final DockerClient docker = clientFactory.docker(artifactStoreConfig);
-            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir(),
-                    publishArtifactRequest.getEnvironmentVariables());
+            Map<String, String> environmentVariables = publishArtifactRequest.getEnvironmentVariables() == null ? new HashMap<>() : publishArtifactRequest.getEnvironmentVariables();
+            environmentVariables.putAll(System.getenv());
+            final DockerImage image = artifactPlan.getArtifactPlanConfig().imageToPush(publishArtifactRequest.getAgentWorkingDir(), environmentVariables);
 
             LOG.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
             consoleLogger.info(format("Pushing docker image `%s` to docker registry `%s`.", image, artifactStoreConfig.getRegistryUrl()));
