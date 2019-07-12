@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0-104
+
+* [bc23ccd](https://github.com/gocd/docker-registry-artifact-plugin/commit/bc23ccd) - Allow support to read System environment variables while publishing artifact.
+
 
 ## 1.0.1-92
 
