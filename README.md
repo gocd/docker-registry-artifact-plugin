@@ -83,6 +83,7 @@ If `RegistryType` is `other`
 3. Configure the build specific artifact details.
    - Optionally specify the `Image` and `Tag`. Usually, the `Tag` can be an environment variable that changes for every build. For example, the `GO_PIPELINE_LABEL` can be used to publish a versioned docker image.
    - Optionally specify the `BuildFile`. Specify a json file name. The format of the file should be `{"image": "name", "tag": "tag pattern"}`. The `BuildFile` option can be used if the `Tag` option cannot be specified for the tag pattern you want to use. The generation of this json file must be handled within the GoCD job.
+   - A private registry has to be part of the image name, like `RegistryURL/Image`.
 
    ![](images/build_and_publish_image_artifacts.png)
 
