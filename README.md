@@ -87,6 +87,21 @@ If `RegistryType` is `other`
 
    ![](images/build_and_publish_image_artifacts.png)
 
+##### Configure the Image in Publish Artifact Config:
+
+Although the artifact store contains the registry url or the registry ID (in case of ECR), the image that needs to be published to the registry still needs to be tagged appropriately with the registry information. Otherwise, the docker client will be unable to push the image to the registry.
+
+Specify the image as shown in the examples below for various container registries:
+
+- DockerHub: `<DOCKERHUB_USERNAME>/image`
+
+- Quay: `quay.io/<username>/image`
+
+- GCR: `gcr.io/<username>/image`
+
+- ECR: `<registry_id>.dkr.ecr.<aws_region>.amazonaws.com/image`
+
+
 #### Fetch artifact config
 
 To pull an image from an upstream pipeline or stage, the following information is required:
