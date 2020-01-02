@@ -69,7 +69,7 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: '1.11.665'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.11.665'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'junit', name: 'junit', version: '4.13'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
