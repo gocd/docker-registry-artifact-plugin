@@ -22,7 +22,7 @@ public class ArtifactPlanConfigTypeAdapter implements JsonDeserializer<ArtifactP
 
     private Optional<String> parseTag(JsonObject jsonObject) {
         JsonElement tag = jsonObject.get("Tag");
-        if (tag != null && StringUtils.isNotBlank(tag.getAsString())) {
+        if (tag != null && !tag.isJsonNull() && StringUtils.isNotBlank(tag.getAsString())) {
             return Optional.of(tag.getAsString());
         }
         return Optional.empty();
