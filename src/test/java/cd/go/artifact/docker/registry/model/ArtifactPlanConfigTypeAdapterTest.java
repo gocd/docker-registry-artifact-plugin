@@ -34,6 +34,23 @@ public class ArtifactPlanConfigTypeAdapterTest {
     }
 
     @Test
+    public void shouldAllowNullTagAndDefaultToLatest() throws JSONException {
+        List<String> inputs = Arrays.asList(
+                new JSONObject().put("Image", "alpine").toString(),
+                new JSONObject().put("Image", "alpine").put("Tag", null).toString(),
+                new JSONObject().put("Image", "alpine").put("Tag", (String) null).toString(),
+                new JSONObject().put("Image", "alpine").toString());
+
+        for (String json : inputs) {
+            ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
+
+            assertThat(artifactPlanConfig).isInstanceOf(ImageTagArtifactPlanConfig.class);
+            assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getImage()).isEqualTo("alpine");
+            assertThat(((ImageTagArtifactPlanConfig) artifactPlanConfig).getTag()).isEqualTo("latest");
+        }
+    }
+
+    @Test
     public void shouldDeserializeToBuildFilePlanConfig() throws JSONException {
         List<String> inputs = Arrays.asList(
                 new JSONObject().put("BuildFile", "info.json").put("Tag", "").put("Image", "").toString(),
