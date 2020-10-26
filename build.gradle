@@ -71,7 +71,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.13'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.18.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
     testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.12.2'
