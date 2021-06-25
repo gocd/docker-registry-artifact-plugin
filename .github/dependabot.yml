@@ -1,0 +1,21 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: friday
+  open-pull-requests-limit: 99
+  ignore:
+  - dependency-name: cd.go.plugin:go-plugin-api
+    versions:
+    - "> 19.5.0"
+  - dependency-name: com.amazonaws:aws-java-sdk-ecr
+    versions:
+    - "> 1.11.931, < 1.12"
+  - dependency-name: com.amazonaws:aws-java-sdk-sts
+    versions:
+    - "> 1.11.931, < 1.12"
+  - dependency-name: org.mockito:mockito-core
+    versions:
+    - 3.8.0
