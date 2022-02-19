@@ -1,7 +1,7 @@
 package cd.go.artifact.docker.registry.model;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 

@@ -29,16 +29,16 @@ import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,13 +50,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
+@ExtendWith(SystemStubsExtension.class)
 public class PublishArtifactExecutorTest {
-    @Rule
-    public TemporaryFolder tmpFolder = new TemporaryFolder();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @TempDir
+    public Path tmpFolder;
 
     @Mock
     private GoPluginApiRequest request;
@@ -68,16 +67,16 @@ public class PublishArtifactExecutorTest {
     private DefaultDockerClient dockerClient;
     @Mock
     private DockerClientFactory dockerClientFactory;
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
-    private File agentWorkingDir;
+    @SystemStub
+    public EnvironmentVariables environmentVariables;
 
-    @Before
+    private Path agentWorkingDir;
+
+    @BeforeEach
     public void setUp() throws IOException, InterruptedException, DockerException, DockerCertificateException {
-        initMocks(this);
-        environmentVariables.clear();
-        agentWorkingDir = tmpFolder.newFolder("go-agent");
+        openMocks(this);
+        agentWorkingDir = Files.createDirectory(tmpFolder.resolve("go-agent"));
 
         when(dockerClientFactory.docker(any())).thenReturn(dockerClient);
     }
@@ -87,9 +86,9 @@ public class PublishArtifactExecutorTest {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.toString());
 
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build.json");
+        Path path = agentWorkingDir.resolve("build.json");
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
@@ -103,11 +102,11 @@ public class PublishArtifactExecutorTest {
     }
 
     @Test
-    public void shouldPublishArtifactUsingImageAndTag() throws IOException, DockerException, InterruptedException {
+    public void shouldPublishArtifactUsingImageAndTag() throws DockerException, InterruptedException {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "alpine", Optional.of("3.6"));
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.toString());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
         when(dockerProgressHandler.getDigest()).thenReturn("foo");
@@ -124,10 +123,10 @@ public class PublishArtifactExecutorTest {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "build.json");
         final ArtifactStoreConfig artifactStoreConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), artifactStoreConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.toString());
         final ArgumentCaptor<DockerProgressHandler> argumentCaptor = ArgumentCaptor.forClass(DockerProgressHandler.class);
 
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build.json");
+        Path path = Paths.get(agentWorkingDir.toString(), "build.json");
         Files.write(path, "{\"image\":\"localhost:5000/alpine\",\"tag\":\"3.6\"}".getBytes());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
@@ -144,7 +143,7 @@ public class PublishArtifactExecutorTest {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "${IMAGE_NAME}", Optional.of("3.6"));
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath(), Collections.singletonMap("IMAGE_NAME", "alpine"));
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.toString(), Collections.singletonMap("IMAGE_NAME", "alpine"));
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
         when(dockerProgressHandler.getDigest()).thenReturn("foo");
@@ -162,7 +161,7 @@ public class PublishArtifactExecutorTest {
         final ArtifactPlan artifactPlan = new ArtifactPlan("id", "storeId", "${IMAGE_NAME}", Optional.of("3.6"));
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final ArtifactStore artifactStore = new ArtifactStore(artifactPlan.getId(), storeConfig);
-        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.getAbsolutePath());
+        final PublishArtifactRequest publishArtifactRequest = new PublishArtifactRequest(artifactStore, artifactPlan, agentWorkingDir.toString());
 
         when(request.requestBody()).thenReturn(publishArtifactRequest.toJSON());
         when(dockerProgressHandler.getDigest()).thenReturn("foo");

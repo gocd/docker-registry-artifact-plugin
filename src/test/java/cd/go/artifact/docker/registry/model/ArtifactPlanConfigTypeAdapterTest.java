@@ -3,16 +3,14 @@ package cd.go.artifact.docker.registry.model;
 import com.google.gson.JsonParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.fail;
-
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ArtifactPlanConfigTypeAdapterTest {
 
@@ -21,7 +19,7 @@ public class ArtifactPlanConfigTypeAdapterTest {
         List<String> inputs = Arrays.asList(
                 new JSONObject().put("Image", "alpine").toString(),
                 new JSONObject().put("Image", "alpine").put("Tag", "").toString(),
-                new JSONObject().put("Image", "alpine").put("Tag", (String) null).toString(),
+                new JSONObject().put("Image", "alpine").put("Tag", null).toString(),
                 new JSONObject().put("Image", "alpine").toString());
 
         for (String json : inputs) {
@@ -38,7 +36,7 @@ public class ArtifactPlanConfigTypeAdapterTest {
         List<String> inputs = Arrays.asList(
                 new JSONObject().put("Image", "alpine").toString(),
                 new JSONObject().put("Image", "alpine").put("Tag", null).toString(),
-                new JSONObject().put("Image", "alpine").put("Tag", (String) null).toString(),
+                new JSONObject().put("Image", "alpine").put("Tag", null).toString(),
                 new JSONObject().put("Image", "alpine").toString());
 
         for (String json : inputs) {
@@ -55,7 +53,7 @@ public class ArtifactPlanConfigTypeAdapterTest {
         List<String> inputs = Arrays.asList(
                 new JSONObject().put("BuildFile", "info.json").put("Tag", "").put("Image", "").toString(),
                 new JSONObject().put("BuildFile", "info.json").toString(),
-                new JSONObject().put("BuildFile", "info.json").put("Image", (String) null).toString());
+                new JSONObject().put("BuildFile", "info.json").put("Image", null).toString());
 
         for (String json : inputs) {
             ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
@@ -71,18 +69,15 @@ public class ArtifactPlanConfigTypeAdapterTest {
                 new JSONObject().put("BuildFile", "info.json").put("Tag", "").put("Image", "fml").toString());
 
         for (String json : inputs) {
-            try {
-                ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
-                fail("Should not reach here");
-            } catch (JsonParseException e) {
-                assertThat(e.getMessage()).isEqualTo("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
-            }
+            assertThatThrownBy(() -> ArtifactPlanConfig.fromJSON(json))
+                    .isInstanceOf(JsonParseException.class)
+                    .hasMessage("Ambiguous or unknown json. Either `Image` or`BuildFile` property must be specified.");
         }
     }
 
 
     @Test
-    public void shouldParseConfigurationsWithJsonNull() throws JSONException {
+    public void shouldParseConfigurationsWithJsonNull() {
         String json = "{\"BuildFile\": null, \"Image\": \"alpine\"}";
         ArtifactPlanConfig artifactPlanConfig = ArtifactPlanConfig.fromJSON(json);
 

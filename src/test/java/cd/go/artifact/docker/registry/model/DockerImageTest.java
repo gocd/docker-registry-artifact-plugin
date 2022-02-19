@@ -17,13 +17,10 @@
 package cd.go.artifact.docker.registry.model;
 
 import com.google.gson.JsonSyntaxException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,25 +28,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class DockerImageTest {
-    @Rule
-    public TemporaryFolder tmpFolder = new TemporaryFolder();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @TempDir
+    public Path tmpFolder;
 
-    private File agentWorkingDir;
+    private Path agentWorkingDir;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        initMocks(this);
-        agentWorkingDir = tmpFolder.newFolder("go-agent");
+        openMocks(this);
+        agentWorkingDir = Files.createDirectory(tmpFolder.resolve("go-agent"));
     }
 
     @Test
     public void shouldDeserializeFileToDockerImage() throws IOException {
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+        Path path = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(path, "{\"image\":\"alpine\",\"tag\":\"3.6\"}".getBytes());
 
         final DockerImage dockerImage = DockerImage.fromFile(path.toFile());
@@ -60,32 +56,28 @@ public class DockerImageTest {
 
     @Test
     public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException {
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+        Path path = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(path, "bar".getBytes());
 
-
-        thrown.expect(JsonSyntaxException.class);
-        thrown.expectMessage("Expected BEGIN_OBJECT but was STRING at line 1 column 1 path");
-
-        DockerImage.fromFile(path.toFile());
+        assertThatThrownBy(() -> DockerImage.fromFile(path.toFile()))
+                .isInstanceOf(JsonSyntaxException.class)
+                .hasMessageContaining("Expected BEGIN_OBJECT but was STRING at line 1 column 1 path");
     }
 
     @Test
     public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException {
-        Path path = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+        Path path = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(path, "[{}]".getBytes());
 
-        thrown.expect(JsonSyntaxException.class);
-        thrown.expectMessage("Expected BEGIN_OBJECT but was BEGIN_ARRAY at line 1 column 2 path");
-
-        DockerImage.fromFile(path.toFile());
+        assertThatThrownBy(() -> DockerImage.fromFile(path.toFile()))
+                .isInstanceOf(JsonSyntaxException.class)
+                .hasMessageContaining("Expected BEGIN_OBJECT but was BEGIN_ARRAY at line 1 column 2 path");
     }
 
     @Test
     public void shouldErrorOutWhenFileDoesNotExist() throws IOException {
-        thrown.expect(FileNotFoundException.class);
-        thrown.expectMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
-
-        DockerImage.fromFile(new File(agentWorkingDir,"random.json"));
+        assertThatThrownBy(() -> DockerImage.fromFile(agentWorkingDir.resolve("random.json").toFile()))
+                .isInstanceOf(FileNotFoundException.class)
+                .hasMessageContaining(String.format("%s/random.json (No such file or directory)", agentWorkingDir.toString()));
     }
 }

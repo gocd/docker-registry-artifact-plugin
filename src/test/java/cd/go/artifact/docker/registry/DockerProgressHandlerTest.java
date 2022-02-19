@@ -16,21 +16,18 @@
 
 package cd.go.artifact.docker.registry;
 
-import cd.go.artifact.docker.registry.ConsoleLogger;
-import cd.go.artifact.docker.registry.DockerProgressHandler;
 import com.spotify.docker.client.messages.ProgressMessage;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class DockerProgressHandlerTest {
     private ConsoleLogger consoleLogger;
     private DockerProgressHandler progressHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         consoleLogger = mock(ConsoleLogger.class);
         progressHandler = new DockerProgressHandler(consoleLogger);
@@ -38,13 +35,11 @@ public class DockerProgressHandlerTest {
 
     @Test
     public void shouldLogErrorToConsoleLogger() {
-        try {
-            progressHandler.progress(ProgressMessage.builder().error("some-error").build());
-            fail("Should throw runtime exception with error message");
-        } catch (RuntimeException e) {
-            verify(consoleLogger, times(1)).error("some-error");
-            assertThat(e.getMessage()).isEqualTo("some-error");
-        }
+        assertThatThrownBy(() -> progressHandler.progress(ProgressMessage.builder().error("some-error").build()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("some-error");
+
+        verify(consoleLogger, times(1)).error("some-error");
     }
 
     @Test

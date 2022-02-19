@@ -27,10 +27,8 @@ import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.HashMap;
@@ -38,16 +36,10 @@ import java.util.HashMap;
 import static cd.go.artifact.docker.registry.executors.FetchArtifactExecutor.FetchArtifactRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class FetchArtifactExecutorTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Mock
     private GoPluginApiRequest request;
     @Mock
@@ -59,9 +51,9 @@ public class FetchArtifactExecutorTest {
     @Mock
     private ConsoleLogger consoleLogger;
 
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException, DockerException, DockerCertificateException {
-        initMocks(this);
+        openMocks(this);
 
         when(dockerClientFactory.docker(any())).thenReturn(dockerClient);
     }
@@ -87,7 +79,7 @@ public class FetchArtifactExecutorTest {
     }
 
     @Test
-    public void shouldNotFetchArtifactWhenSkipImagePullingIsToggled() {
+    public void shouldNotFetchArtifactWhenSkipImagePullingIsToggled() throws Exception {
         final ArtifactStoreConfig storeConfig = new ArtifactStoreConfig("localhost:5000", "other", "admin", "admin123");
         final HashMap<String, String> artifactMetadata = new HashMap<>();
         artifactMetadata.put("image", "localhost:5000/alpine:v1");
@@ -102,11 +94,7 @@ public class FetchArtifactExecutorTest {
 
         final GoPluginApiResponse response = new FetchArtifactExecutor(request, consoleLogger, dockerProgressHandler, dockerClientFactory).execute();
 
-        try {
-            verify(dockerClient, times(0)).pull("localhost:5000/alpine:v1", dockerProgressHandler);
-        } catch (DockerException | InterruptedException e) {
-            /* Should never happen */
-        }
+        verify(dockerClient, times(0)).pull("localhost:5000/alpine:v1", dockerProgressHandler);
 
         assertThat(response.responseCode()).isEqualTo(200);
     }

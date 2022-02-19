@@ -16,13 +16,10 @@
 
 package cd.go.artifact.docker.registry.model;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,66 +28,62 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class BuildFileArtifactPlanConfigTest {
-    @Rule
-    public TemporaryFolder tmpFolder = new TemporaryFolder();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @TempDir
+    public Path tmpFolder;
 
-    private File agentWorkingDir;
+    private Path agentWorkingDir;
     private final Map<String, String> environmentVariables = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        initMocks(this);
-        agentWorkingDir = tmpFolder.newFolder("go-agent");
+        openMocks(this);
+        agentWorkingDir = Files.createDirectory(tmpFolder.resolve("go-agent"));
     }
 
     @Test
     public void shouldReadImageAndTagBuildFile() throws IOException, UnresolvedPropertyException {
-        Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+        Path file = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(file, "{\"image\":\"alpine\",\"tag\":\"3.6\"}".getBytes());
 
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
-        final DockerImage dockerImage = artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
+        final DockerImage dockerImage = artifactPlanConfig.imageToPush(agentWorkingDir.toString(), environmentVariables);
 
         assertThat(dockerImage.getImage()).isEqualTo("alpine");
         assertThat(dockerImage.getTag()).isEqualTo("3.6");
     }
 
     @Test
-    public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException, UnresolvedPropertyException {
-        Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+    public void shouldErrorOutWhenFileContentIsNotAValidJSON() throws IOException {
+        Path file = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(file, "bar".getBytes());
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
-
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
+        assertThatThrownBy(() -> artifactPlanConfig.imageToPush(agentWorkingDir.toString(), environmentVariables))
+            .isInstanceOf(RuntimeException.class)
+                .hasMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
     }
 
     @Test
-    public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException, UnresolvedPropertyException {
-        Path file = Paths.get(agentWorkingDir.getAbsolutePath(), "build-file.json");
+    public void shouldErrorOutWhenFileContentIsJSONArray() throws IOException {
+        Path file = Paths.get(agentWorkingDir.toString(), "build-file.json");
         Files.write(file, "[{}]".getBytes());
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("build-file.json");
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
-
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
+        assertThatThrownBy(() -> artifactPlanConfig.imageToPush(agentWorkingDir.toString(), environmentVariables))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("File[build-file.json] content is not a valid json. It must contain json data `{'image':'DOCKER-IMAGE-NAME', 'tag':'TAG'}` format.");
     }
 
     @Test
-    public void shouldErrorOutWhenFileDoesNotExist() throws UnresolvedPropertyException {
+    public void shouldErrorOutWhenFileDoesNotExist() {
         final ArtifactPlanConfig artifactPlanConfig = new BuildFileArtifactPlanConfig("random.json");
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.getAbsolutePath()));
-
-        artifactPlanConfig.imageToPush(agentWorkingDir.getAbsolutePath(), environmentVariables);
+        assertThatThrownBy(() -> artifactPlanConfig.imageToPush(agentWorkingDir.toString(), environmentVariables))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage(String.format("%s/random.json (No such file or directory)", agentWorkingDir.toString()));
     }
 }

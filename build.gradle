@@ -56,13 +56,20 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: '1.11.931'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.11.931'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.18.1'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.8.2'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
+
+    testImplementation group: 'cd.go.plugin', name: 'go-plugin-api', version: '21.4.0'
+    testImplementation group: 'uk.org.webcompere', name: 'system-stubs-jupiter', version: '1.2.0'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.3.1'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
-    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
-    testImplementation group: 'cd.go.plugin', name: 'go-plugin-api', version: '18.6.0'
+    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {

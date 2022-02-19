@@ -20,8 +20,8 @@ import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.request.GoApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse;
 import org.json.JSONException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -34,7 +34,7 @@ public class ConsoleLoggerTest {
     private static ConsoleLogger consoleLogger;
     private static ArgumentCaptor<GoApiRequest> argumentCaptor;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         accessor = mock(GoApplicationAccessor.class);
         argumentCaptor = ArgumentCaptor.forClass(GoApiRequest.class);
