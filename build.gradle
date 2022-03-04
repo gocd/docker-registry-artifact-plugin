@@ -53,7 +53,7 @@ dependencies {
     compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: '21.4.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation group: 'com.spotify', name: 'docker-client', version: '8.16.0'
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: '1.12.166'
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: '1.12.171'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.12.167'
 
     modules {
