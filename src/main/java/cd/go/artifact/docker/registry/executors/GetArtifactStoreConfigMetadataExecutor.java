@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ThoughtWorks, Inc.
+ * Copyright 2022 Thoughtworks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import cd.go.artifact.docker.registry.annotation.ConfigMetadata;
 import cd.go.artifact.docker.registry.annotation.MetadataHelper;
 import cd.go.artifact.docker.registry.model.ArtifactStoreConfig;
 import cd.go.artifact.docker.registry.utils.Util;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
