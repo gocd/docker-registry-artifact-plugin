@@ -54,7 +54,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation group: 'com.spotify', name: 'docker-client', version: '8.16.0'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: '1.12.272'
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.12.271'
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.12.272'
 
     modules {
         module('commons-logging:commons-logging') {
