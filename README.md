@@ -18,7 +18,7 @@ To build the jar, run `./gradlew clean test assemble`
 
 Build the plugin with `./gradlew clean test assemble`
 
-Copy the file build/libs/docker-registry-artifact-plugin-VERSION.jar to the GoCD server under ${GO_SERVER_DIR}/plugins/external and restart the server. The GO_SERVER_DIR is usually /var/lib/go-server on Linux and C:\Program Files\Go Server on Windows.
+Copy the file `build/libs/docker-registry-artifact-plugin-VERSION.jar` to the GoCD server under `${GO_SERVER_DIR}/plugins/external` and restart the server. The `GO_SERVER_DIR` is usually `/var/lib/go-server` on Linux and `C:\Program Files\Go Server` on Windows.
 
 ### Configuration
 
