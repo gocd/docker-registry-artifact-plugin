@@ -53,6 +53,7 @@ ext {
     deps = [
         gocdPluginApi: 'cd.go.plugin:go-plugin-api:22.3.0',
         awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.356',
+        slf4j        : 'org.slf4j:slf4j-api:2.0.5',
     ]
 
     versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -65,12 +66,18 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: project.versions.awsSdk
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: project.versions.awsSdk
 
+    constraints {
+        implementation(project.deps.slf4j) {
+            because "Spotify docker-client uses an older version"
+        }
+    }
+
     modules {
         module('commons-logging:commons-logging') {
             replacedBy('org.slf4j:jcl-over-slf4j', "Everything should go via SLF4J")
         }
     }
-    implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.36'
+    implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
