@@ -2,10 +2,6 @@
 
 The docker registry artifact plugin provides a way to push and pull docker images on GoCD 
 
-## Building the code base
-
-To build the jar, run `./gradlew clean test assemble`
-
 ## Getting started
 
 ### Requirements
@@ -16,9 +12,8 @@ To build the jar, run `./gradlew clean test assemble`
 
 ### Installation
 
-Build the plugin with `./gradlew clean test assemble`
-
-Copy the file `build/libs/docker-registry-artifact-plugin-VERSION.jar` to the GoCD server under `${GO_SERVER_DIR}/plugins/external` and restart the server. The `GO_SERVER_DIR` is usually `/var/lib/go-server` on Linux and `C:\Program Files\Go Server` on Windows.
+* Download the right version of the plugin from [the Releases](https://github.com/gocd/docker-registry-artifact-plugin/releases) page. The direct link to the latest released version is: https://github.com/gocd/docker-registry-artifact-plugin/releases/latest
+* Copy the file `build/libs/docker-registry-artifact-plugin-VERSION.jar` to the GoCD server under `${GO_SERVER_DIR}/plugins/external` and restart the server. * The `GO_SERVER_DIR` is usually `/var/lib/go-server` on Linux and `C:\Program Files\Go Server` on Windows.
 
 ### Configuration
 
@@ -159,6 +154,10 @@ docker run -e "GOCD_SERVER_JVM_OPTIONS=-Dplugin.cd.go.artifact.docker.registry.l
     # since the last "wrapper.java.additional" index is 15, we use the next available index.
     wrapper.java.additional.16=-Dplugin.cd.go.artifact.docker.registry.log.level=debug
     ```
+
+## Building the code base
+
+To build the jar, run `./gradlew clean test assemble`
 
 ## License
 
