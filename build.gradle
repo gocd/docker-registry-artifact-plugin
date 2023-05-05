@@ -105,7 +105,7 @@ dependencies {
     testImplementation platform('org.mockito:mockito-bom:5.3.1')
     testImplementation group: 'org.mockito', name: 'mockito-core'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
-    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.15.4'
+    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.16.1'
 }
 
 test {
