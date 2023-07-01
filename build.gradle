@@ -18,24 +18,28 @@ apply plugin: 'java'
 apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 
 gocdPlugin {
-  id = 'cd.go.artifact.docker.registry'
-  pluginVersion = '1.3.1'
-  goCdVersion = '20.9.0'
-  name = 'Artifact plugin for docker'
-  description = 'Plugin allows to push/pull docker image from public or private docker registry'
-  vendorName = 'Thoughtworks, Inc.'
-  vendorUrl = 'https://github.com/gocd/docker-registry-artifact-plugin'
+    id = 'cd.go.artifact.docker.registry'
+    pluginVersion = '1.3.1'
+    goCdVersion = '20.9.0'
+    name = 'Artifact plugin for docker'
+    description = 'Plugin allows to push/pull docker image from public or private docker registry'
+    vendorName = 'Thoughtworks, Inc.'
+    vendorUrl = 'https://github.com/gocd/docker-registry-artifact-plugin'
 
-  githubRepo {
-    owner = System.getenv('GITHUB_USER') ?: 'bob'
-    repo = 'docker-registry-artifact-plugin'
-    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-  }
+    githubRepo {
+        owner = System.getenv('GITHUB_USER') ?: 'bob'
+        repo = 'docker-registry-artifact-plugin'
+        token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+    }
 
-  pluginProject = project
+    pluginProject = project
 
-  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
-  assetsToRelease = [project.tasks.findByName('jar')]
+    prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+    assetsToRelease = [project.tasks.findByName('jar')]
+
+    licenseReport {
+        excludes = ['com.google.guava:guava-parent']
+    }
 }
 
 version = gocdPlugin.fullVersion(project)
@@ -82,6 +86,20 @@ dependencies {
         implementation('commons-io:commons-io:2.13.0') {
             because "Spotify docker-client uses an older version"
         }
+    }
+
+    components {
+        // workaround for Guava metadata declaring dependencies that are not needed at runtime
+        // see https://github.com/google/guava/pull/6606
+        withModule('com.google.guava:guava', { details ->
+            details.allVariants {
+                withDependencies {
+                    removeAll {
+                        it.group in ["com.google.code.findbugs", "org.checkerframework", "com.google.errorprone"]
+                    }
+                }
+            }
+        })
     }
 
     modules {
