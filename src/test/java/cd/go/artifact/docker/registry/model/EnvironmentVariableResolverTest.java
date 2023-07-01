@@ -1,6 +1,5 @@
 package cd.go.artifact.docker.registry.model;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ public class EnvironmentVariableResolverTest {
     @Test
     public void shouldResolveTagPatternWithSingleEnvironmentVariable() throws UnresolvedPropertyException {
         EnvironmentVariableResolver environmentVariableResolver = new EnvironmentVariableResolver("v${GO_PIPELINE_COUNTER}", "tag");
-        Map<String, String> environmentVariables = ImmutableMap.of("GO_PIPELINE_COUNTER", "112");
+        Map<String, String> environmentVariables = Map.of("GO_PIPELINE_COUNTER", "112");
 
         String tag = environmentVariableResolver.resolve(environmentVariables);
 
@@ -23,7 +22,7 @@ public class EnvironmentVariableResolverTest {
     @Test
     public void shouldResolveTagPatternWithMultipleEnvironmentVariables() throws UnresolvedPropertyException {
         EnvironmentVariableResolver environmentVariableResolver = new EnvironmentVariableResolver("v${GO_PIPELINE_COUNTER}-${GO_STAGE_COUNTER}", "tag");
-        Map<String, String> environmentVariables = ImmutableMap.of("GO_PIPELINE_COUNTER", "112",
+        Map<String, String> environmentVariables = Map.of("GO_PIPELINE_COUNTER", "112",
                 "GO_STAGE_COUNTER", "1");
 
         String tag = environmentVariableResolver.resolve(environmentVariables);
@@ -34,7 +33,7 @@ public class EnvironmentVariableResolverTest {
     @Test
     public void shouldThrowExceptionIfTagIsUnresolved() {
         EnvironmentVariableResolver environmentVariableResolver = new EnvironmentVariableResolver("v${GO_PIPELINE_COUNTER}-${GO_STAGE_COUNTER}", "tag");
-        Map<String, String> environmentVariables = ImmutableMap.of("GO_PIPELINE_COUNTER", "112");
+        Map<String, String> environmentVariables = Map.of("GO_PIPELINE_COUNTER", "112");
 
         boolean exceptionCaught = false;
         try {
