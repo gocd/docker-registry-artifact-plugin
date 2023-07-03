@@ -117,6 +117,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
 
     testImplementation project.deps.gocdPluginApi
     testImplementation group: 'uk.org.webcompere', name: 'system-stubs-jupiter', version: '2.0.2'
