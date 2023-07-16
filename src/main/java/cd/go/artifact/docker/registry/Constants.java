@@ -18,22 +18,19 @@ package cd.go.artifact.docker.registry;
 
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 
-import static java.util.Arrays.asList;
+import java.util.List;
 
 public interface Constants {
     // The type of this extension
     String EXTENSION_TYPE = "artifact";
 
     // The extension point API version that this plugin understands
-    String OLDER_EXTENSION_API_VERSION = "1.0";
     String EXTENSION_API_VERSION = "2.0";
     String CONSOLE_LOG_PROCESSOR_API_VERSION = "1.0";
 
     // the identifier of this plugin
-    GoPluginIdentifier PLUGIN_IDENTIFIER = new GoPluginIdentifier(EXTENSION_TYPE, asList(OLDER_EXTENSION_API_VERSION, EXTENSION_API_VERSION));
+    GoPluginIdentifier PLUGIN_IDENTIFIER = new GoPluginIdentifier(EXTENSION_TYPE, List.of(EXTENSION_API_VERSION));
 
     // requests that the plugin makes to the server
-    String REQUEST_SERVER_PREFIX = "go.processor";
-    String REQUEST_SERVER_GET_PLUGIN_SETTINGS = REQUEST_SERVER_PREFIX + ".plugin-settings.get";
     String SEND_CONSOLE_LOG = "go.processor.artifact.console-log";
 }
