@@ -110,7 +110,7 @@ dependencies {
             replacedBy('org.bouncycastle:bcpkix-jdk18on', "Everything can go via the JDK 1.8+ BouncyCastle version")
         }
     }
-    implementation('org.bouncycastle:bcpkix-jdk18on:1.75')
+    implementation('org.bouncycastle:bcpkix-jdk18on:1.76')
     implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
