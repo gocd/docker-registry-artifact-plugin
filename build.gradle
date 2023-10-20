@@ -36,10 +36,6 @@ gocdPlugin {
 
     prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
     assetsToRelease = [project.tasks.findByName('jar')]
-
-    licenseReport {
-        excludes = ['com.google.guava:guava-parent']
-    }
 }
 
 version = gocdPlugin.fullVersion(project)
