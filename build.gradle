@@ -79,7 +79,7 @@ dependencies {
         implementation('org.apache.commons:commons-compress:1.24.0') {
             because "Spotify docker-client uses an older version"
         }
-        implementation('commons-io:commons-io:2.14.0') {
+        implementation('commons-io:commons-io:2.15.0') {
             because "Spotify docker-client uses an older version"
         }
     }
