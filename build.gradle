@@ -118,7 +118,7 @@ dependencies {
     testImplementation project.deps.gocdPluginApi
     testImplementation group: 'uk.org.webcompere', name: 'system-stubs-jupiter', version: '2.1.3'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
-    testImplementation platform('org.mockito:mockito-bom:5.6.0')
+    testImplementation platform('org.mockito:mockito-bom:5.7.0')
     testImplementation group: 'org.mockito', name: 'mockito-core'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
     testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.16.2'
