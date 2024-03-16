@@ -76,7 +76,7 @@ dependencies {
         implementation(project.deps.slf4j) {
             because "Spotify docker-client uses an older version"
         }
-        implementation('org.apache.commons:commons-compress:1.26.0') {
+        implementation('org.apache.commons:commons-compress:1.26.1') {
             because "Spotify docker-client uses an older version"
         }
         implementation('commons-io:commons-io:2.15.1') {
