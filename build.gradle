@@ -70,7 +70,7 @@ dependencies {
     implementation platform('com.fasterxml.jackson:jackson-bom:2.17.1')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
-        implementation('com.google.guava:guava:33.2.0-jre') {
+        implementation('com.google.guava:guava:33.2.1-jre') {
             because "Spotify docker-client uses an older version"
         }
         implementation(project.deps.slf4j) {
