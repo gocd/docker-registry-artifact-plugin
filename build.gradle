@@ -109,7 +109,7 @@ dependencies {
     implementation('org.bouncycastle:bcpkix-jdk18on:1.78.1')
     implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
 
-    testImplementation platform('org.junit:junit-bom:5.11.1')
+    testImplementation platform('org.junit:junit-bom:5.11.2')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
