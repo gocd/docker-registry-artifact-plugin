@@ -68,7 +68,7 @@ dependencies {
 
     // Control/upgrade Spotify docker-client transitive dependencies
     implementation platform('com.fasterxml.jackson:jackson-bom:2.18.2')
-    implementation platform('org.glassfish.jersey:jersey-bom:2.25')
+    implementation platform('org.glassfish.jersey:jersey-bom:2.46')
     constraints {
         implementation('com.google.guava:guava:33.4.0-jre') {
             because "Spotify docker-client uses an older version"
