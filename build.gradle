@@ -70,7 +70,7 @@ dependencies {
     implementation platform('com.fasterxml.jackson:jackson-bom:2.18.3')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
-        implementation('com.google.guava:guava:33.4.0-jre') {
+        implementation('com.google.guava:guava:33.4.5-jre') {
             because "Spotify docker-client uses an older version"
         }
         implementation(project.deps.slf4j) {
@@ -91,7 +91,7 @@ dependencies {
             details.allVariants {
                 withDependencies {
                     removeAll {
-                        it.name in [ "jsr305", "checker-qual", "error_prone_annotations", "listenablefuture", "j2objc-annotations" ]
+                        it.name in [ "listenablefuture", "jspecify", "error_prone_annotations", "j2objc-annotations" ]
                     }
                 }
             }
