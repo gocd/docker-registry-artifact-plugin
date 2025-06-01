@@ -68,7 +68,7 @@ dependencies {
 
     // Control/upgrade Spotify docker-client transitive dependencies
     implementation platform('com.fasterxml.jackson:jackson-bom:2.19.0')
-    implementation platform('org.glassfish.jersey:jersey-bom:2.25')
+    implementation platform('org.glassfish.jersey:jersey-bom:2.46')
     constraints {
         implementation('com.google.guava:guava:33.4.8-jre') {
             because "Spotify docker-client uses an older version"
@@ -109,7 +109,7 @@ dependencies {
     implementation('org.bouncycastle:bcpkix-jdk18on:1.80')
     implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
 
-    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation platform('org.junit:junit-bom:5.13.0')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
@@ -118,7 +118,7 @@ dependencies {
     testImplementation project.deps.gocdPluginApi
     testImplementation group: 'uk.org.webcompere', name: 'system-stubs-jupiter', version: '2.1.8'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
-    testImplementation platform('org.mockito:mockito-bom:5.17.0')
+    testImplementation platform('org.mockito:mockito-bom:5.18.0')
     testImplementation group: 'org.mockito', name: 'mockito-core'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
     testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.20.1'
