@@ -52,7 +52,7 @@ java {
 ext {
     deps = [
         gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
-        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.783',
+        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.787',
         slf4j        : 'org.slf4j:slf4j-api:2.0.17',
     ]
 
@@ -67,7 +67,7 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: project.versions.awsSdk
 
     // Control/upgrade Spotify docker-client transitive dependencies
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.19.0')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.19.1')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
         implementation('com.google.guava:guava:33.4.8-jre') {
@@ -106,10 +106,10 @@ dependencies {
             replacedBy('org.bouncycastle:bcpkix-jdk18on', "Everything can go via the JDK 1.8+ BouncyCastle version")
         }
     }
-    implementation('org.bouncycastle:bcpkix-jdk18on:1.80')
+    implementation('org.bouncycastle:bcpkix-jdk18on:1.81')
     implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
 
-    testImplementation platform('org.junit:junit-bom:5.13.0')
+    testImplementation platform('org.junit:junit-bom:5.13.2')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
@@ -121,7 +121,7 @@ dependencies {
     testImplementation platform('org.mockito:mockito-bom:5.18.0')
     testImplementation group: 'org.mockito', name: 'mockito-core'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.20.1'
+    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.21.1'
 }
 
 test {
