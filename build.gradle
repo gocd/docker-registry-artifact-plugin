@@ -65,10 +65,10 @@ ext {
 
 dependencies {
     compileOnly project.deps.gocdPluginApi
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
-    implementation group: 'com.spotify', name: 'docker-client', version: '8.16.0'
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-ecr', version: project.versions.awsSdk
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: project.versions.awsSdk
+    implementation 'com.google.code.gson:gson:2.13.2'
+    implementation 'com.spotify:docker-client:8.16.0'
+    implementation "com.amazonaws:aws-java-sdk-ecr:${project.versions.awsSdk}"
+    implementation "com.amazonaws:aws-java-sdk-sts:${project.versions.awsSdk}"
 
     // Control/upgrade Spotify docker-client transitive dependencies
     implementation platform('com.fasterxml.jackson:jackson-bom:2.20.0')
@@ -111,21 +111,21 @@ dependencies {
         }
     }
     implementation('org.bouncycastle:bcpkix-jdk18on:1.82')
-    implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.versions.slf4j
+    implementation "org.slf4j:jcl-over-slf4j:${project.versions.slf4j}"
 
     testImplementation platform('org.junit:junit-bom:6.0.0')
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
-    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation project.deps.gocdPluginApi
-    testImplementation group: 'uk.org.webcompere', name: 'system-stubs-jupiter', version: '2.1.8'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+    testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
+    testImplementation 'org.assertj:assertj-core:3.27.6'
     testImplementation platform('org.mockito:mockito-bom:5.20.0')
-    testImplementation group: 'org.mockito', name: 'mockito-core'
-    testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.21.2'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.skyscreamer:jsonassert:1.5.3'
+    testImplementation 'org.jsoup:jsoup:1.21.2'
 }
 
 test {
