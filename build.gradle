@@ -59,7 +59,7 @@ tasks.withType(JavaCompile).configureEach {
 ext {
     deps = [
         gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
-        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.791',
+        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.793',
         slf4j        : 'org.slf4j:slf4j-api:2.0.17',
     ]
 
@@ -74,7 +74,7 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-sts:${project.versions.awsSdk}"
 
     // Control/upgrade Spotify docker-client transitive dependencies
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.20.0')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.20.1')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
         implementation('com.google.guava:guava:33.5.0-jre') {
@@ -116,7 +116,7 @@ dependencies {
     implementation('org.bouncycastle:bcpkix-jdk18on:1.82')
     implementation "org.slf4j:jcl-over-slf4j:${project.versions.slf4j}"
 
-    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation platform('org.junit:junit-bom:6.0.1')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
