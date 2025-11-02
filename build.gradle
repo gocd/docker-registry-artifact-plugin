@@ -89,6 +89,9 @@ dependencies {
         implementation('commons-io:commons-io:2.20.0') {
             because "Spotify docker-client uses an older version"
         }
+        implementation('com.github.jnr:jnr-unixsocket:0.38.24') {
+            because "Spotify docker-client uses an older version"
+        }
     }
 
     components {
