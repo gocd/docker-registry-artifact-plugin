@@ -77,20 +77,26 @@ dependencies {
     implementation platform('com.fasterxml.jackson:jackson-bom:2.20.1')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
-        implementation('com.google.guava:guava:33.5.0-jre') {
-            because "Spotify docker-client uses an older version"
-        }
-        implementation(project.deps.slf4j) {
-            because "Spotify docker-client uses an older version"
+        implementation('commons-io:commons-io:2.20.0') {
+            because "spotify docker-client uses an older version"
         }
         implementation('org.apache.commons:commons-compress:1.28.0') {
-            because "Spotify docker-client uses an older version"
+            because "spotify docker-client uses an older version"
         }
-        implementation('commons-io:commons-io:2.20.0') {
-            because "Spotify docker-client uses an older version"
+        implementation('org.apache.commons:commons-lang3:3.19.0') {
+            because 'spotify docker-client uses an outdated version'
+        }
+        implementation('com.google.guava:guava:33.5.0-jre') {
+            because "spotify docker-client uses an older version"
+        }
+        implementation('org.apache.httpcomponents:httpclient:4.5.14') {
+            because 'spotify docker-client uses an outdated version'
         }
         implementation('com.github.jnr:jnr-unixsocket:0.38.24') {
-            because "Spotify docker-client uses an older version"
+            because "spotify docker-client uses an older version"
+        }
+        implementation(project.deps.slf4j) {
+            because "spotify docker-client uses an older version"
         }
     }
 
@@ -116,7 +122,9 @@ dependencies {
             replacedBy('org.bouncycastle:bcpkix-jdk18on', "Everything can go via the JDK 1.8+ BouncyCastle version")
         }
     }
-    implementation('org.bouncycastle:bcpkix-jdk18on:1.82')
+    implementation('org.bouncycastle:bcpkix-jdk18on:1.82') {
+        because 'spotify docker-client uses an outdated version'
+    }
     implementation "org.slf4j:jcl-over-slf4j:${project.versions.slf4j}"
 
     testImplementation platform('org.junit:junit-bom:6.0.1')
