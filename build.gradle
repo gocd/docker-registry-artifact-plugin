@@ -58,8 +58,8 @@ tasks.withType(JavaCompile).configureEach {
 
 ext {
     deps = [
-        gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
-        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.794',
+        gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.4.0',
+        awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.797',
         slf4j        : 'org.slf4j:slf4j-api:2.0.17',
     ]
 
@@ -136,10 +136,10 @@ dependencies {
     testImplementation project.deps.gocdPluginApi
     testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
     testImplementation 'org.assertj:assertj-core:3.27.6'
-    testImplementation platform('org.mockito:mockito-bom:5.20.0')
+    testImplementation platform('org.mockito:mockito-bom:5.21.0')
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.skyscreamer:jsonassert:1.5.3'
-    testImplementation 'org.jsoup:jsoup:1.21.2'
+    testImplementation 'org.jsoup:jsoup:1.22.1'
 }
 
 test {
