@@ -135,7 +135,7 @@ dependencies {
 
     testImplementation project.deps.gocdPluginApi
     testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
-    testImplementation 'org.assertj:assertj-core:3.27.6'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation platform('org.mockito:mockito-bom:5.21.0')
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.skyscreamer:jsonassert:1.5.3'
