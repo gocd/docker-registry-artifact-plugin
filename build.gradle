@@ -76,7 +76,7 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-sts:${project.versions.awsSdk}"
 
     // Control/upgrade Spotify docker-client transitive dependencies
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.0')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.1')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
         implementation('commons-io:commons-io:2.21.0') {
@@ -129,7 +129,7 @@ dependencies {
     }
     implementation "org.slf4j:jcl-over-slf4j:${project.versions.slf4j}"
 
-    testImplementation platform('org.junit:junit-bom:6.0.2')
+    testImplementation platform('org.junit:junit-bom:6.0.3')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
@@ -138,7 +138,7 @@ dependencies {
     testImplementation project.deps.gocdPluginApi
     testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
     testImplementation 'org.assertj:assertj-core:3.27.7'
-    testImplementation platform('org.mockito:mockito-bom:5.21.0')
+    testImplementation platform('org.mockito:mockito-bom:5.22.0')
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.skyscreamer:jsonassert:1.5.3'
     testImplementation 'org.jsoup:jsoup:1.22.1'
