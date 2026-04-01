@@ -76,7 +76,7 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-sts:${project.versions.awsSdk}"
 
     // Control/upgrade Spotify docker-client transitive dependencies
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.1')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.2')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
         implementation('commons-io:commons-io:2.21.0') {
@@ -94,7 +94,7 @@ dependencies {
         implementation('org.apache.httpcomponents:httpclient:4.5.14') {
             because 'spotify docker-client uses an outdated version'
         }
-        implementation('com.github.jnr:jnr-unixsocket:0.38.24') {
+        implementation('com.github.jnr:jnr-unixsocket:0.38.25') {
             because "spotify docker-client uses an older version"
         }
         implementation(project.deps.slf4j) {
@@ -138,7 +138,7 @@ dependencies {
     testImplementation project.deps.gocdPluginApi
     testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
     testImplementation 'org.assertj:assertj-core:3.27.7'
-    testImplementation platform('org.mockito:mockito-bom:5.22.0')
+    testImplementation platform('org.mockito:mockito-bom:5.23.0')
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.skyscreamer:jsonassert:1.5.3'
     testImplementation 'org.jsoup:jsoup:1.22.1'
