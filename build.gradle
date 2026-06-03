@@ -60,7 +60,7 @@ ext {
     deps = [
         gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.4.0',
         awsSdk       : 'com.amazonaws:aws-java-sdk:1.12.797',
-        slf4j        : 'org.slf4j:slf4j-api:2.0.17',
+        slf4j        : 'org.slf4j:slf4j-api:2.0.18',
     ]
 
     versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -76,7 +76,7 @@ dependencies {
     implementation "com.amazonaws:aws-java-sdk-sts:${project.versions.awsSdk}"
 
     // Control/upgrade Spotify docker-client transitive dependencies
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.3')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.4')
     implementation platform('org.glassfish.jersey:jersey-bom:2.25')
     constraints {
         implementation('commons-io:commons-io:2.22.0') {
@@ -129,7 +129,7 @@ dependencies {
     }
     implementation "org.slf4j:jcl-over-slf4j:${project.versions.slf4j}"
 
-    testImplementation platform('org.junit:junit-bom:6.0.3')
+    testImplementation platform('org.junit:junit-bom:6.1.0')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
